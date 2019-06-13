@@ -4,7 +4,8 @@
 #right now set at 10ms
 #so every 0.01s def animate is called and the interval value is how many times it has been called
 
-
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import pandas
