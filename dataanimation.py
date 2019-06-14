@@ -1,9 +1,3 @@
-#notes to self:
-#interval value passed to def animate is the number of times it has been called by FuncAnimation
-#interval value set in FuncAnimation is the delay between frames in ms
-#right now set at 10ms
-#so every 0.01s def animate is called and the interval value is how many times it has been called
-
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -12,16 +6,18 @@ import pandas
 
 TABLE = pandas.read_csv("Data.csv")
 
+# Set up the empty figure and subplot we want to animate on
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
+
 xs=[]
 ys=[]
 
 def animate(interval):
 
-    time = interval
-    #print(time)
-    #convert to TIME series to int for handling purposes
+    time = interval #interval is number of times 'animate' has been called
+                    #by FuncAnimation
+    # convert to TIME series to int for handling purposes
     TABLE.TIME = TABLE.TIME.astype(int)
 
     if time in TABLE.TIME.unique(): 
@@ -37,7 +33,7 @@ def animate(interval):
         xs.append(x)
         ys.append(y)
 
-        ax1.clear()
+        ax1.clear() # clear the subplot
         ax1.plot(xs,ys)
         ax1.set_xlabel('Crosshead Displacement (in)', fontweight = 'bold')
         ax1.set_ylabel('Force (lbs)', fontweight = 'bold')
@@ -45,10 +41,23 @@ def animate(interval):
         ax1.set_title(str(TABLE[TABLE.TIME==time].TIME.item()) + 's', fontweight = 'bold')
     return
 
-#for some reason 0 is called twice so we need to add an extra frame in order to get last data point
-FRAMES= TABLE.TIME.astype(int).max()+1   
-ani = animation.FuncAnimation(fig, animate, interval=1000, frames=FRAMES, repeat=False)
+#Pass number of frames to 'animate' that is equivalent to max number of seconds
+#from Data.csv
+#for some reason 0 is called twice so we need to add an extra frame in order
+#to get last data point
+FRAMES = TABLE.TIME.astype(int).max() + 1
 
+#FuncAnimation will animate to 'fig' based on function passed to it
+#called 'animate'. Every 'interval' (1000 ms) 'animate' will be called.
+#'interval' is also the delay between 'frames'.
+#'repeat' = False because we don't want animation to repeat when the sequence of
+#'frames' is completed. 
+ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
+                              repeat=False)
+
+plt.show()
 plt.rcParams['animation.ffmpeg_path']='/usr/local/bin/ffmpeg'
 writer = animation.FFMpegWriter(fps=1)
 ani.save('dataanimation.mp4', writer=writer)
+
+#ani.save('basic_animation.html', fps = 1, extra_args = ['-vcodec', 'libx264'])
