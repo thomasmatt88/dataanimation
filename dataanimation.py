@@ -5,6 +5,8 @@ import matplotlib.animation as animation
 import pandas
 
 TABLE = pandas.read_csv("Data.csv")
+# convert to TIME series to int for handling purposes
+TABLE.TIME = TABLE.TIME.astype(int)
 
 # Set up the empty figure and subplot we want to animate on
 fig = plt.figure()
@@ -17,8 +19,6 @@ def animate(interval):
 
     time = interval #interval is number of times 'animate' has been called
                     #by FuncAnimation
-    # convert to TIME series to int for handling purposes
-    TABLE.TIME = TABLE.TIME.astype(int)
 
     if time in TABLE.TIME.unique(): 
 
@@ -55,7 +55,7 @@ FRAMES = TABLE.TIME.astype(int).max() + 1
 ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
                               repeat=False)
 
-plt.show()
+#plt.show()
 plt.rcParams['animation.ffmpeg_path']='/usr/local/bin/ffmpeg'
 writer = animation.FFMpegWriter(fps=1)
 ani.save('dataanimation.mp4', writer=writer)
