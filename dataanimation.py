@@ -14,31 +14,35 @@ ax1 = fig.add_subplot(1,1,1)
 
 xs=[]
 ys=[]
+def data_for_animate(time):
+    "returns xs and ys as of 'time' to be plotted in 'animate'"
+    POSIT_series = TABLE[TABLE.TIME == time].POSIT
+    POSIT_list = POSIT_series.tolist()
+    x = POSIT_list[0]
+
+    FORCE_series = TABLE[TABLE.TIME == time].FORCE
+    FORCE_list = FORCE_series.tolist()
+    y = FORCE_list[0]
+
+    xs.append(x)
+    ys.append(y)
+    return xs, ys
 
 def animate(interval):
+    "plot data from TABLE on ax1 as of time = 'interval'"
 
     time = interval #interval is number of times 'animate' has been called
                     #by FuncAnimation
 
     if time in TABLE.TIME.unique(): 
-
-        POSIT_series = TABLE[TABLE.TIME == time].POSIT
-        POSIT_list = POSIT_series.tolist()
-        x = POSIT_list[0]
-
-        FORCE_series = TABLE[TABLE.TIME == time].FORCE
-        FORCE_list = FORCE_series.tolist()
-        y = FORCE_list[0]
-
-        xs.append(x)
-        ys.append(y)
-
+        XS, YS = data_for_animate(time)
         ax1.clear() # clear the subplot
-        ax1.plot(xs,ys)
+        ax1.plot(XS, YS)
         ax1.set_xlabel('Crosshead Displacement (in)', fontweight = 'bold')
         ax1.set_ylabel('Force (lbs)', fontweight = 'bold')
         #https://stackoverflow.com/questions/30787901/how-to-get-a-value-from-a-pandas-dataframe-and-not-the-index-and-object-type
-        ax1.set_title(str(TABLE[TABLE.TIME==time].TIME.item()) + 's', fontweight = 'bold')
+        ax1.set_title(str(TABLE[TABLE.TIME == time].TIME.item()) + 's', \
+                      fontweight = 'bold')
     return
 
 #Pass number of frames to 'animate' that is equivalent to max number of seconds
@@ -57,7 +61,7 @@ ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
 
 #plt.show()
 plt.rcParams['animation.ffmpeg_path']='/usr/local/bin/ffmpeg'
-writer = animation.FFMpegWriter(fps=1)
-ani.save('dataanimation.mp4', writer=writer)
-
+writer = animation.FFMpegWriter(fps = 1)
+ani.save('dataanimation.mp4', writer = writer)
+ 
 #ani.save('basic_animation.html', fps = 1, extra_args = ['-vcodec', 'libx264'])
