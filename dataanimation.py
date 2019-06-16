@@ -57,11 +57,13 @@ FRAMES = TABLE.TIME.astype(int).max() + 1
 #'repeat' = False because we don't want animation to repeat when the sequence of
 #'frames' is completed. 
 ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
-                              repeat=False)
+                              repeat = False)
 
 #plt.show()
-plt.rcParams['animation.ffmpeg_path']='/usr/local/bin/ffmpeg'
-writer = animation.FFMpegWriter(fps = 1)
-ani.save('dataanimation.mp4', writer = writer)
+#all rc settings are stored in a dictionary-like variable called
+#matplotlib.rcParams, which is global to the matplotlib package
+plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
+writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
+ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
  
 #ani.save('basic_animation.html', fps = 1, extra_args = ['-vcodec', 'libx264'])
