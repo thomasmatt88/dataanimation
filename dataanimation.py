@@ -3,10 +3,33 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import pandas
+import tkinter as tk
 
-TABLE = pandas.read_csv("Data.csv")
+
+class DataAnimationGui:
+    def __init__(self, master):
+        frame = tk.Frame(master)
+        frame.pack()
+
+        self.quitButton = tk.Button(frame, text = "Quit", command = frame.quit)
+        self.quitButton.pack()
+        self.fileButton = tk.Button(frame, text = "Open File", \
+                                    command = self.fileopen)
+        self.fileButton.pack()
+        self.data_file_path = "Data.csv"
+
+    def fileopen(self):
+        self.data_file_path = tk.filedialog.askopenfile()
+
+root_win = tk.Tk()
+cls_ref = DataAnimationGui(root_win)
+root_win.mainloop()
+data_file_path = cls_ref.data_file_path
+
+TABLE = pandas.read_csv(data_file_path)
 # convert to TIME series to int for handling purposes
 TABLE.TIME = TABLE.TIME.astype(int)
+
 
 # Set up the empty figure and subplot we want to animate on
 fig = plt.figure()
