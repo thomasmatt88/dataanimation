@@ -43,6 +43,8 @@ def animate(interval):
         #https://stackoverflow.com/questions/30787901/how-to-get-a-value-from-a-pandas-dataframe-and-not-the-index-and-object-type
         ax1.set_title(str(TABLE[TABLE.TIME == time].TIME.item()) + 's', \
                       fontweight = 'bold')
+        fig.savefig('Output_Images/' + \
+                    str(TABLE[TABLE.TIME == time].TIME.item()) + '.png')
     return
 
 #Pass number of frames to 'animate' that is equivalent to max number of seconds
@@ -59,11 +61,12 @@ FRAMES = TABLE.TIME.astype(int).max() + 1
 ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
                               repeat = False)
 
-#plt.show()
+plt.show() #must have plt.show() for fig.savefig() to work in animat()
 #all rc settings are stored in a dictionary-like variable called
 #matplotlib.rcParams, which is global to the matplotlib package
+"""
 plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
 writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
 ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
- 
+"""
 #ani.save('basic_animation.html', fps = 1, extra_args = ['-vcodec', 'libx264'])
