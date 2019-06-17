@@ -8,27 +8,49 @@ import tkinter as tk
 
 class DataAnimationGui:
     def __init__(self, master):
-        frame = tk.Frame(master)
-        frame.pack()
+        topframe = tk.Frame(master)
+        topframe.pack(side = tk.TOP)
+        bottomframe = tk.Frame(master)
+        bottomframe.pack(side = tk.BOTTOM)
 
-        self.quitButton = tk.Button(frame, text = "Quit", command = frame.quit)
-        self.quitButton.pack()
-        self.fileButton = tk.Button(frame, text = "Open File", \
+        self.quitButton = tk.Button(topframe, text = "Quit", \
+                                    command = topframe.quit)
+        self.quitButton.pack(side = tk.RIGHT)
+        self.fileButton = tk.Button(topframe, text = "Open File", \
                                     command = self.fileopen)
-        self.fileButton.pack()
+        self.fileButton.pack(side = tk.LEFT)
         self.data_file_path = "Data.csv"
+        self.selected_x_axis = tk.StringVar()
+        self.x_axis_options = ["1", "2", "3"]
+        self.x_axis_menu = tk.OptionMenu(bottomframe, self.selected_x_axis, \
+                                         *self.x_axis_options)
+        self.x_axis_menu.pack()
 
     def fileopen(self):
         self.data_file_path = tk.filedialog.askopenfile()
 
+    def set_x_axis_options(self, user_list):
+        self.x_axis_options = user_list
+        return True
+
+    def set_x_axis_menu(self):
+        self.x_axis_menu["menu"].delete(0, 'end')
+        for item in self.x_axis_options:
+            self.x_axis_menu["menu"].add_command(label = item)
+
+    def get_x_axis_options(self):
+        return self.x_axis_options
+
 root_win = tk.Tk()
 cls_ref = DataAnimationGui(root_win)
-root_win.mainloop()
 data_file_path = cls_ref.data_file_path
-
 TABLE = pandas.read_csv(data_file_path)
+cls_ref.set_x_axis_options(list(TABLE.columns.values))
+cls_ref.set_x_axis_menu()
 # convert to TIME series to int for handling purposes
 TABLE.TIME = TABLE.TIME.astype(int)
+root_win.mainloop()
+
 
 
 # Set up the empty figure and subplot we want to animate on
