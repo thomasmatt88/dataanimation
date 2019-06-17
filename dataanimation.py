@@ -61,12 +61,12 @@ FRAMES = TABLE.TIME.astype(int).max() + 1
 ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
                               repeat = False)
 
-plt.show() #must have plt.show() for fig.savefig() to work in animat()
 #all rc settings are stored in a dictionary-like variable called
 #matplotlib.rcParams, which is global to the matplotlib package
-"""
-plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
-writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
-ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
-"""
+try:
+    plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
+    writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
+    ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
+except:
+    plt.show() #must have plt.show() for fig.savefig() to work in animat()
 #ani.save('basic_animation.html', fps = 1, extra_args = ['-vcodec', 'libx264'])
