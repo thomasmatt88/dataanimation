@@ -20,8 +20,9 @@ class DataAnimationGui:
                                     command = self.fileopen)
         self.fileButton.pack(side = tk.LEFT)
         self.data_file_path = "Data.csv"
-        self.selected_x_axis = tk.StringVar()
-        self.x_axis_options = ["1", "2", "3"]
+        self.selected_x_axis = tk.StringVar(bottomframe) #track what x_axis_menu is set to
+        self.x_axis_options = [None]
+        self.selected_x_axis.set(self.x_axis_options[0])
         self.x_axis_menu = tk.OptionMenu(bottomframe, self.selected_x_axis, \
                                          *self.x_axis_options)
         self.x_axis_menu.pack()
@@ -36,7 +37,11 @@ class DataAnimationGui:
     def set_x_axis_menu(self):
         self.x_axis_menu["menu"].delete(0, 'end')
         for item in self.x_axis_options:
-            self.x_axis_menu["menu"].add_command(label = item)
+            self.x_axis_menu["menu"].add_command(label = item, \
+                                                 command = lambda v = item: self.selected_x_axis.set(v))
+
+    def set_selected_x_axis(self, select):
+        self.selected_x_axis = select
 
     def get_x_axis_options(self):
         return self.x_axis_options
@@ -105,6 +110,7 @@ FRAMES = TABLE.TIME.astype(int).max() + 1
 #'frames' is completed. 
 ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
                               repeat = False)
+plt.show()
 
 #all rc settings are stored in a dictionary-like variable called
 #matplotlib.rcParams, which is global to the matplotlib package
