@@ -8,28 +8,54 @@ import tkinter as tk
 
 class DataAnimationGui:
     def __init__(self, master):
+        self.data_file_path = "Data.csv"
+        
+        # --------------- frames --------------------------------------------------------
         topframe = tk.Frame(master)
         topframe.pack(side = tk.TOP)
         bottomframe = tk.Frame(master)
         bottomframe.pack(side = tk.BOTTOM)
+        bottomleftframe = tk.Frame(bottomframe)
+        bottomleftframe.pack(side = tk.LEFT)
+        bottommiddleframe = tk.Frame(bottomframe)
+        bottommiddleframe.pack(side = tk.LEFT)
 
+        # --------------- buttons -------------------------------------------------------
         self.quitButton = tk.Button(topframe, text = "Quit", \
                                     command = topframe.quit)
         self.quitButton.pack(side = tk.RIGHT)
         self.fileButton = tk.Button(topframe, text = "Open File", \
                                     command = self.fileopen)
         self.fileButton.pack(side = tk.LEFT)
-        self.data_file_path = "Data.csv"
-        self.selected_x_axis = tk.StringVar(bottomframe) #track what x_axis_menu is set to
+
+        # ---------------- labels --------------------------------------------------------
+        self.x_axis_label = tk.Label(bottomleftframe, text = "X-Axis: ")
+        self.x_axis_label.pack(side = tk.LEFT)
+        self.y_axis_label = tk.Label(bottommiddleframe, text = "Y-Axis: ")
+        self.y_axis_label.pack(side = tk.LEFT)
+
+        # ---------------- drop down menus ----------------------------------------------
+        # X-Axis:
+        self.selected_x_axis = tk.StringVar(bottomleftframe) #track what x_axis_menu is set to
         self.x_axis_options = [None]
         self.selected_x_axis.set(self.x_axis_options[0])
-        self.x_axis_menu = tk.OptionMenu(bottomframe, self.selected_x_axis, \
+        self.x_axis_menu = tk.OptionMenu(bottomleftframe, self.selected_x_axis, \
                                          *self.x_axis_options)
-        self.x_axis_menu.pack()
+        self.x_axis_menu.pack(side = tk.LEFT)
+
+        # Y-Axis
+        self.selected_y_axis = tk.StringVar(bottommiddleframe) #track what y_axis_menu is set to
+        self.y_axis_options = [None]
+        self.selected_y_axis.set(self.y_axis_options[0])
+        self.y_axis_menu = tk.OptionMenu(bottommiddleframe, self.selected_y_axis, \
+                                         *self.y_axis_options)
+        self.y_axis_menu.pack(side = tk.LEFT)
+        
 
     def fileopen(self):
         self.data_file_path = tk.filedialog.askopenfile()
 
+    # mutators ---------------------------------------------------------------------------
     def set_x_axis_options(self, user_list):
         self.x_axis_options = user_list
         return True
@@ -43,8 +69,26 @@ class DataAnimationGui:
     def set_selected_x_axis(self, select):
         self.selected_x_axis = select
 
+    def set_y_axis_options(self, user_list):
+        self.y_axis_options = user_list
+        return True
+
+    def set_y_axis_menu(self):
+        self.y_axis_menu["menu"].delete(0, 'end')
+        for item in self.y_axis_options:
+            self.y_axis_menu["menu"].add_command(label = item, \
+                                                 command = lambda v = item: self.selected_y_axis.set(v))
+
+    def set_selected_y_axis(self, select):
+        self.selected_y_axis = select
+
+
+    # accessors --------------------------------------------------------------------------
     def get_x_axis_options(self):
         return self.x_axis_options
+    
+    def get_y_axis_options(self):
+        return self.y_axis_options
 
 root_win = tk.Tk()
 cls_ref = DataAnimationGui(root_win)
@@ -52,6 +96,8 @@ data_file_path = cls_ref.data_file_path
 TABLE = pandas.read_csv(data_file_path)
 cls_ref.set_x_axis_options(list(TABLE.columns.values))
 cls_ref.set_x_axis_menu()
+cls_ref.set_y_axis_options(list(TABLE.columns.values))
+cls_ref.set_y_axis_menu()
 # convert to TIME series to int for handling purposes
 TABLE.TIME = TABLE.TIME.astype(int)
 root_win.mainloop()
