@@ -22,7 +22,7 @@ class DataAnimationGui:
 
         # --------------- buttons -------------------------------------------------------
         self.quitButton = tk.Button(topframe, text = "Quit", \
-                                    command = topframe.quit)
+                                    command = master.destroy)
         self.quitButton.pack(side = tk.RIGHT)
         self.fileButton = tk.Button(topframe, text = "Open File", \
                                     command = self.fileopen)
@@ -90,6 +90,7 @@ class DataAnimationGui:
     def get_y_axis_options(self):
         return self.y_axis_options
 
+# start of gui access ----------------------------------------------------------
 root_win = tk.Tk()
 cls_ref = DataAnimationGui(root_win)
 data_file_path = cls_ref.data_file_path
@@ -98,12 +99,14 @@ cls_ref.set_x_axis_options(list(TABLE.columns.values))
 cls_ref.set_x_axis_menu()
 cls_ref.set_y_axis_options(list(TABLE.columns.values))
 cls_ref.set_y_axis_menu()
-# convert to TIME series to int for handling purposes
-TABLE.TIME = TABLE.TIME.astype(int)
 root_win.mainloop()
 
+usr_x_axis = cls_ref.selected_x_axis.get() # x_axis chosen in gui
+usr_y_axis = cls_ref.selected_y_axis.get() # y_axis chosen in gui
+# end of gui access ------------------------------------------------------------
 
-
+# convert to TIME series to int for handling purposes
+TABLE.TIME = TABLE.TIME.astype(int)
 # Set up the empty figure and subplot we want to animate on
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
@@ -112,15 +115,13 @@ xs=[]
 ys=[]
 def data_for_animate(time):
     "returns xs and ys as of 'time' to be plotted in 'animate'"
-    POSIT_series = TABLE[TABLE.TIME == time].POSIT
-    #POSIT_series = TABLE[TABLE.TIME == time][cls_ref.selected_x_axis.get()] #linked to gui
-    POSIT_list = POSIT_series.tolist()
-    x = POSIT_list[0]
+    X_series = TABLE[TABLE.TIME == time][usr_x_axis] # linked to gui
+    X_list = X_series.tolist()
+    x = X_list[0]
 
-    #FORCE_series = TABLE[TABLE.TIME == time][cls_ref.selected_y_axis.get()] #linked to gui
-    FORCE_series = TABLE[TABLE.TIME == time].FORCE
-    FORCE_list = FORCE_series.tolist()
-    y = FORCE_list[0]
+    Y_series = TABLE[TABLE.TIME == time][usr_y_axis] # linked to gui
+    Y_list = Y_series.tolist()
+    y = Y_list[0]
 
     xs.append(x)
     ys.append(y)
@@ -158,7 +159,7 @@ FRAMES = TABLE.TIME.astype(int).max() + 1
 #'frames' is completed. 
 ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
                               repeat = False)
-plt.show()
+#plt.show()
 
 #all rc settings are stored in a dictionary-like variable called
 #matplotlib.rcParams, which is global to the matplotlib package
