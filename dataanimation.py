@@ -113,9 +113,11 @@ ys=[]
 def data_for_animate(time):
     "returns xs and ys as of 'time' to be plotted in 'animate'"
     POSIT_series = TABLE[TABLE.TIME == time].POSIT
+    #POSIT_series = TABLE[TABLE.TIME == time][cls_ref.selected_x_axis.get()] #linked to gui
     POSIT_list = POSIT_series.tolist()
     x = POSIT_list[0]
 
+    #FORCE_series = TABLE[TABLE.TIME == time][cls_ref.selected_y_axis.get()] #linked to gui
     FORCE_series = TABLE[TABLE.TIME == time].FORCE
     FORCE_list = FORCE_series.tolist()
     y = FORCE_list[0]
