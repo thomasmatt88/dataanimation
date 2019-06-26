@@ -5,7 +5,60 @@ import matplotlib.animation as animation
 import pandas
 import tkinter as tk
 
+def main():
+    
+    # start of gui access ----------------------------------------------------------
+    root_win = tk.Tk()
+    cls_ref = DataAnimationGui(root_win)
+    data_file_path = cls_ref.data_file_path
+    TABLE = pandas.read_csv(data_file_path)
+    cls_ref.set_x_axis_options(list(TABLE.columns.values))
+    cls_ref.set_x_axis_menu()
+    cls_ref.set_y_axis_options(list(TABLE.columns.values))
+    cls_ref.set_y_axis_menu()
+    root_win.mainloop()
 
+    usr_x_axis = cls_ref.selected_x_axis.get() # x_axis chosen in gui
+    usr_y_axis = cls_ref.selected_y_axis.get() # y_axis chosen in gui
+    # end of gui access ------------------------------------------------------------
+
+    # convert to TIME series to int for handling purposes
+    TABLE.TIME = TABLE.TIME.astype(int)
+    # Set up the empty figure and subplot we want to animate on
+    fig = plt.figure()
+    ax1 = fig.add_subplot(1,1,1)
+
+    
+    #Pass number of frames to 'animate' that is equivalent to max number of seconds
+    #from Data.csv
+    #for some reason 0 is called twice so we need to add an extra frame in order
+    #to get last data point
+    FRAMES = TABLE.TIME.astype(int).max() + 1
+
+    #FuncAnimation will animate to 'fig' based on function passed to it
+    #called 'animate'. Every 'interval' (1000 ms) 'animate' will be called.
+    #'interval' is also the delay between 'frames'.
+    #'repeat' = False because we don't want animation to repeat when the sequence of
+    #'frames' is completed.
+    xs = [] # initialized lists to pass to animate()
+    ys = []
+    ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
+                                  fargs = (xs, ys, usr_x_axis, usr_y_axis, fig, \
+                                           ax1, TABLE), repeat = False)
+
+    #all rc settings are stored in a dictionary-like variable called
+    #matplotlib.rcParams, which is global to the matplotlib package
+    try:
+        plt.show() # plt.show() has to be before ani.save() in order to work
+        # must have plt.show() for fig.savefig() to work in animate()
+        plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
+        writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
+        ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
+    except Exception as e:
+        print(e)
+
+
+    
 class DataAnimationGui:
     def __init__(self, master):
         self.data_file_path = "Data.csv"
@@ -90,83 +143,43 @@ class DataAnimationGui:
     def get_y_axis_options(self):
         return self.y_axis_options
 
-# start of gui access ----------------------------------------------------------
-root_win = tk.Tk()
-cls_ref = DataAnimationGui(root_win)
-data_file_path = cls_ref.data_file_path
-TABLE = pandas.read_csv(data_file_path)
-cls_ref.set_x_axis_options(list(TABLE.columns.values))
-cls_ref.set_x_axis_menu()
-cls_ref.set_y_axis_options(list(TABLE.columns.values))
-cls_ref.set_y_axis_menu()
-root_win.mainloop()
-
-usr_x_axis = cls_ref.selected_x_axis.get() # x_axis chosen in gui
-usr_y_axis = cls_ref.selected_y_axis.get() # y_axis chosen in gui
-# end of gui access ------------------------------------------------------------
-
-# convert to TIME series to int for handling purposes
-TABLE.TIME = TABLE.TIME.astype(int)
-# Set up the empty figure and subplot we want to animate on
-fig = plt.figure()
-ax1 = fig.add_subplot(1,1,1)
-
-xs=[]
-ys=[]
-def data_for_animate(time):
-    "returns xs and ys as of 'time' to be plotted in 'animate'"
-    X_series = TABLE[TABLE.TIME == time][usr_x_axis] # linked to gui
+def data_for_animate(time, x_axis, y_axis, df):
+    "returns xs and ys from df as of 'time' to be plotted in 'animate'"
+    X_series = df[df.TIME == time][x_axis] # linked to gui
     X_list = X_series.tolist()
     x = X_list[0]
 
-    Y_series = TABLE[TABLE.TIME == time][usr_y_axis] # linked to gui
+    Y_series = df[df.TIME == time][y_axis] # linked to gui
     Y_list = Y_series.tolist()
     y = Y_list[0]
+    
+    return x, y
 
-    xs.append(x)
-    ys.append(y)
-    return xs, ys
-
-def animate(interval):
-    "plot data from TABLE on ax1 as of time = 'interval'"
+def animate(interval, xs, ys, x_axis, y_axis, figure, subplot, data_frame):
+    """plot data from data_frame on subplot as of time = 'interval'
+       xs = []
+       ys = []
+       x_axis, y_axis are column headers of data_frame that animate
+                      will plot against each other 
+    """
 
     time = interval #interval is number of times 'animate' has been called
                     #by FuncAnimation
 
-    if time in TABLE.TIME.unique(): 
-        XS, YS = data_for_animate(time)
-        ax1.clear() # clear the subplot
-        ax1.plot(XS, YS)
-        ax1.set_xlabel('Crosshead Displacement (in)', fontweight = 'bold')
-        ax1.set_ylabel('Force (lbs)', fontweight = 'bold')
+    if time in data_frame.TIME.unique(): 
+        X, Y = data_for_animate(time, x_axis, y_axis, data_frame)
+        xs.append(X)
+        ys.append(Y)
+        subplot.clear() # clear the subplot
+        subplot.plot(xs, ys)
+        subplot.set_xlabel('Crosshead Displacement (in)', fontweight = 'bold')
+        subplot.set_ylabel('Force (lbs)', fontweight = 'bold')
         #https://stackoverflow.com/questions/30787901/how-to-get-a-value-from-a-pandas-dataframe-and-not-the-index-and-object-type
-        ax1.set_title(str(TABLE[TABLE.TIME == time].TIME.item()) + 's', \
-                      fontweight = 'bold')
-        fig.savefig('Output_Images/' + \
-                    str(TABLE[TABLE.TIME == time].TIME.item()) + '.png')
+        subplot.set_title(str(data_frame[data_frame.TIME == time].TIME.item()) \
+                          + 's', fontweight = 'bold')
+        figure.savefig('Output_Images/' + \
+                    str(data_frame[data_frame.TIME == time].TIME.item()) + '.png')
     return
 
-#Pass number of frames to 'animate' that is equivalent to max number of seconds
-#from Data.csv
-#for some reason 0 is called twice so we need to add an extra frame in order
-#to get last data point
-FRAMES = TABLE.TIME.astype(int).max() + 1
-
-#FuncAnimation will animate to 'fig' based on function passed to it
-#called 'animate'. Every 'interval' (1000 ms) 'animate' will be called.
-#'interval' is also the delay between 'frames'.
-#'repeat' = False because we don't want animation to repeat when the sequence of
-#'frames' is completed. 
-ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
-                              repeat = False)
-
-#all rc settings are stored in a dictionary-like variable called
-#matplotlib.rcParams, which is global to the matplotlib package
-try:
-    plt.show() # plt.show() has to be before ani.save() in order to work
-    # must have plt.show() for fig.savefig() to work in animate()
-    plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
-    writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
-    ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
-except Exception as e:
-    print(e)
+if __name__ == "__main__":
+    main()
