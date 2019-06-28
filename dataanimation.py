@@ -18,9 +18,10 @@ class DataAnimationGui:
         
         # --------------- frames --------------------------------------------------------
         topframe = tk.Frame(master)
-        topframe.pack(side = tk.TOP)
+        topframe.pack(fill = tk.X, side = tk.TOP)
+        #topframe.configure(background = "gray")
         middleframe = tk.Frame(master)
-        middleframe.pack(side = tk.TOP)
+        middleframe.pack(fill = tk.X, side = tk.TOP)
         middleleftframe = tk.Frame(middleframe)
         middleleftframe.pack(side = tk.LEFT)
         middlemiddleframe = tk.Frame(middleframe)
@@ -28,11 +29,12 @@ class DataAnimationGui:
         middlerightframe = tk.Frame(middleframe)
         middlerightframe.pack(side = tk.LEFT)
         bottomframe = tk.Frame(master)
-        bottomframe.pack(side = tk.TOP)
+        bottomframe.pack(fill = tk.X, side = tk.TOP)
         bottomleftframe = tk.Frame(bottomframe)
         bottomleftframe.pack(side = tk.LEFT)
         bottomrightframe = tk.Frame(bottomframe)
         bottomrightframe.pack(side = tk.LEFT)
+        
 
         # --------------- buttons -------------------------------------------------------
         self.fileButton = tk.Button(topframe, text = "Open File", \
@@ -43,21 +45,21 @@ class DataAnimationGui:
         self.createButton.pack(side = tk.LEFT)
         self.quitButton = tk.Button(topframe, text = "Quit", \
                                     command = master.destroy)
-        self.quitButton.pack(side = tk.RIGHT)
+        self.quitButton.pack(side = tk.LEFT)
 
         # ---------------- labels -------------------------------------------------------
-        self.x_axis_label = tk.Label(middleleftframe, text = "X-Axis: ")
+        self.x_axis_label = tk.Label(middleleftframe, text = "X-Axis: ", fg = "blue")
         self.x_axis_label.pack(side = tk.LEFT)
-        self.y_axis_label = tk.Label(middlemiddleframe, text = "Y-Axis: ")
+        self.y_axis_label = tk.Label(middlemiddleframe, text = "Y-Axis: ", fg = "blue")
         self.y_axis_label.pack(side = tk.LEFT)
-        self.t_axis_label = tk.Label(middlerightframe, text = "Time-Axis: ")
+        self.t_axis_label = tk.Label(middlerightframe, text = "Time-Axis: ", fg = "blue")
         self.t_axis_label.pack(side = tk.LEFT)       
 
         self.x_axis_title_label = tk.Label(bottomleftframe, \
-                                           text = "X-Axis Title: ")
+                                           text = "X-Axis Title: ", fg = "blue")
         self.x_axis_title_label.pack(side = tk.LEFT)
         self.y_axis_title_label = tk.Label(bottomrightframe, \
-                                           text = "Y-Axis Title: ")
+                                           text = "Y-Axis Title: ", fg = "blue")
         self.y_axis_title_label.pack(side = tk.LEFT)
 
         # ---------------- entry -------------------------------------------------------
@@ -99,14 +101,17 @@ class DataAnimationGui:
     # helpers ---------------------------------------------------------------------------
     def fileopen(self):
         "open file and update df and menu options"
-        self.data_file_path = tk.filedialog.askopenfile()
-        self.df = pandas.read_csv(self.data_file_path)
-        self.set_x_axis_options(list(self.df.columns.values))
-        self.set_x_axis_menu()
-        self.set_y_axis_options(list(self.df.columns.values))
-        self.set_y_axis_menu()
-        self.set_t_axis_options(list(self.df.columns.values))
-        self.set_t_axis_menu()       
+        try:
+            self.data_file_path = tk.filedialog.askopenfile()
+            self.df = pandas.read_csv(self.data_file_path)
+            self.set_x_axis_options(list(self.df.columns.values))
+            self.set_x_axis_menu()
+            self.set_y_axis_options(list(self.df.columns.values))
+            self.set_y_axis_menu()
+            self.set_t_axis_options(list(self.df.columns.values))
+            self.set_t_axis_menu()
+        except:
+            pass
 
     def create_animation(self):
         try:
