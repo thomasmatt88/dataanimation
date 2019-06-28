@@ -23,6 +23,8 @@ class DataAnimationGui:
         middleframe.pack(side = tk.TOP)
         middleleftframe = tk.Frame(middleframe)
         middleleftframe.pack(side = tk.LEFT)
+        middlemiddleframe = tk.Frame(middleframe)
+        middlemiddleframe.pack(side = tk.LEFT)
         middlerightframe = tk.Frame(middleframe)
         middlerightframe.pack(side = tk.LEFT)
         bottomframe = tk.Frame(master)
@@ -46,8 +48,10 @@ class DataAnimationGui:
         # ---------------- labels -------------------------------------------------------
         self.x_axis_label = tk.Label(middleleftframe, text = "X-Axis: ")
         self.x_axis_label.pack(side = tk.LEFT)
-        self.y_axis_label = tk.Label(middlerightframe, text = "Y-Axis: ")
+        self.y_axis_label = tk.Label(middlemiddleframe, text = "Y-Axis: ")
         self.y_axis_label.pack(side = tk.LEFT)
+        self.t_axis_label = tk.Label(middlerightframe, text = "Time-Axis: ")
+        self.t_axis_label.pack(side = tk.LEFT)       
 
         self.x_axis_title_label = tk.Label(bottomleftframe, \
                                            text = "X-Axis Title: ")
@@ -77,12 +81,20 @@ class DataAnimationGui:
         self.x_axis_menu.pack(side = tk.LEFT)
 
         # Y-Axis
-        self.selected_y_axis = tk.StringVar(middlerightframe) #track what y_axis_menu is set to
+        self.selected_y_axis = tk.StringVar(middlemiddleframe) #track what y_axis_menu is set to
         self.y_axis_options = [None]
         self.selected_y_axis.set(self.y_axis_options[0])
-        self.y_axis_menu = tk.OptionMenu(middlerightframe, self.selected_y_axis, \
+        self.y_axis_menu = tk.OptionMenu(middlemiddleframe, self.selected_y_axis, \
                                          *self.y_axis_options)
         self.y_axis_menu.pack(side = tk.LEFT)
+
+        # Time-Axis
+        self.selected_t_axis = tk.StringVar(middlerightframe) #track what t_axis_menu is set to
+        self.t_axis_options = [None]
+        self.selected_t_axis.set(self.t_axis_options[0])
+        self.t_axis_menu = tk.OptionMenu(middlerightframe, self.selected_t_axis, \
+                                         *self.t_axis_options)
+        self.t_axis_menu.pack(side = tk.LEFT)       
         
     # helpers ---------------------------------------------------------------------------
     def fileopen(self):
@@ -93,6 +105,8 @@ class DataAnimationGui:
         self.set_x_axis_menu()
         self.set_y_axis_options(list(self.df.columns.values))
         self.set_y_axis_menu()
+        self.set_t_axis_options(list(self.df.columns.values))
+        self.set_t_axis_menu()       
 
     def create_animation(self):
         try:
@@ -167,10 +181,22 @@ class DataAnimationGui:
             self.y_axis_menu["menu"].add_command(label = item, \
                                                  command = lambda v = item: self.selected_y_axis.set(v))
 
-    def set_selected_y_axis(self, select):
-        self.selected_y_axis = select
+    def set_selected_t_axis(self, select):
+        self.selected_t_axis = select
 
+    def set_t_axis_options(self, user_list):
+        self.t_axis_options = user_list
+        return True
 
+    def set_t_axis_menu(self):
+        self.t_axis_menu["menu"].delete(0, 'end')
+        for item in self.t_axis_options:
+            self.t_axis_menu["menu"].add_command(label = item, \
+                                                 command = lambda v = item: self.selected_t_axis.set(v))
+
+    def set_selected_t_axis(self, select):
+        self.selected_t_axis = select
+    
     # accessors --------------------------------------------------------------------------
     def get_x_axis_options(self):
         return self.x_axis_options
