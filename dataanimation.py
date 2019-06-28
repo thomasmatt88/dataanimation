@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import pandas
 import tkinter as tk
+from tkinter import messagebox
 
 def main():
     root_win = tk.Tk()
@@ -94,49 +95,53 @@ class DataAnimationGui:
         self.set_y_axis_menu()
 
     def create_animation(self):
-        # start of gui access ----------------------------------------------------------
-        TABLE = self.get_df() # dataframe from file chosen in gui
-        usr_x_axis = self.selected_x_axis.get() # x_axis chosen in gui
-        usr_y_axis = self.selected_y_axis.get() # y_axis chosen in gui
-        usr_x_axis_title = self.x_axis_title.get() # x_axis title from gui
-        usr_y_axis_title = self.y_axis_title.get() # y_axis title from gui
-        # end of gui access ------------------------------------------------------------
-
-        # convert to TIME series to int for handling purposes
-        TABLE.TIME = TABLE.TIME.astype(int)
-        # Set up the empty figure and subplot we want to animate on
-        fig = plt.figure()
-        ax1 = fig.add_subplot(1,1,1)
-
-        
-        #Pass number of frames to 'animate' that is equivalent to max number of seconds
-        #from Data.csv
-        #for some reason 0 is called twice so we need to add an extra frame in order
-        #to get last data point
-        FRAMES = TABLE.TIME.astype(int).max() + 1
-
-        #FuncAnimation will animate to 'fig' based on function passed to it
-        #called 'animate'. Every 'interval' (1000 ms) 'animate' will be called.
-        #'interval' is also the delay between 'frames'.
-        #'repeat' = False because we don't want animation to repeat when the sequence of
-        #'frames' is completed.
-        xs = [] # initialized lists to pass to animate()
-        ys = []
-        ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
-                                      fargs = (xs, ys, usr_x_axis, usr_x_axis_title,
-                                               usr_y_axis, usr_y_axis_title, fig, ax1, \
-                                               TABLE), repeat = False)
-
-        #all rc settings are stored in a dictionary-like variable called
-        #matplotlib.rcParams, which is global to the matplotlib package
         try:
-            plt.show() # plt.show() has to be before ani.save() in order to work
-            # must have plt.show() for fig.savefig() to work in animate()
-            plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
-            writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
-            ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
-        except Exception as e:
-            print(e)
+            # start of gui access ----------------------------------------------------------
+            TABLE = self.get_df() # dataframe from file chosen in gui
+            usr_x_axis = self.selected_x_axis.get() # x_axis chosen in gui
+            usr_y_axis = self.selected_y_axis.get() # y_axis chosen in gui
+            usr_x_axis_title = self.x_axis_title.get() # x_axis title from gui
+            usr_y_axis_title = self.y_axis_title.get() # y_axis title from gui
+            # end of gui access ------------------------------------------------------------
+
+            # convert to TIME series to int for handling purposes
+            TABLE.TIME = TABLE.TIME.astype(int)
+            # Set up the empty figure and subplot we want to animate on
+            fig = plt.figure()
+            ax1 = fig.add_subplot(1,1,1)
+
+            
+            #Pass number of frames to 'animate' that is equivalent to max number of seconds
+            #from Data.csv
+            #for some reason 0 is called twice so we need to add an extra frame in order
+            #to get last data point
+            FRAMES = TABLE.TIME.astype(int).max() + 1
+
+            #FuncAnimation will animate to 'fig' based on function passed to it
+            #called 'animate'. Every 'interval' (1000 ms) 'animate' will be called.
+            #'interval' is also the delay between 'frames'.
+            #'repeat' = False because we don't want animation to repeat when the sequence of
+            #'frames' is completed.
+            xs = [] # initialized lists to pass to animate()
+            ys = []
+            ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
+                                          fargs = (xs, ys, usr_x_axis, usr_x_axis_title,
+                                                   usr_y_axis, usr_y_axis_title, fig, ax1, \
+                                                   TABLE), repeat = False)
+
+            #all rc settings are stored in a dictionary-like variable called
+            #matplotlib.rcParams, which is global to the matplotlib package
+            try:
+                plt.show() # plt.show() has to be before ani.save() in order to work
+                # must have plt.show() for fig.savefig() to work in animate()
+                plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
+                writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
+                ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
+            except Exception as e:
+                print(e)
+        except:
+            messagebox.showinfo(message = "Error: Did you choose X-axis " + \
+                                " and Y-axis from dropdown menus?")
 
     # mutators --------------------------------------------------------------------------
     def set_x_axis_options(self, user_list):
