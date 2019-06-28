@@ -9,7 +9,6 @@ def main():
     root_win = tk.Tk()
     cls_ref = DataAnimationGui(root_win)
     root_win.mainloop()
-    print("Done")
     
 class DataAnimationGui:
     def __init__(self, master):
@@ -19,12 +18,16 @@ class DataAnimationGui:
         # --------------- frames --------------------------------------------------------
         topframe = tk.Frame(master)
         topframe.pack(side = tk.TOP)
+        middleframe = tk.Frame(master)
+        middleframe.pack(side = tk.TOP)
+        middleleftframe = tk.Frame(middleframe)
+        middleleftframe.pack(side = tk.LEFT)
+        middlerightframe = tk.Frame(middleframe)
+        middlerightframe.pack(side = tk.LEFT)
         bottomframe = tk.Frame(master)
-        bottomframe.pack(side = tk.BOTTOM)
+        bottomframe.pack(side = tk.TOP)
         bottomleftframe = tk.Frame(bottomframe)
         bottomleftframe.pack(side = tk.LEFT)
-        bottommiddleframe = tk.Frame(bottomframe)
-        bottommiddleframe.pack(side = tk.LEFT)
 
         # --------------- buttons -------------------------------------------------------
         self.fileButton = tk.Button(topframe, text = "Open File", \
@@ -38,25 +41,35 @@ class DataAnimationGui:
         self.quitButton.pack(side = tk.RIGHT)
 
         # ---------------- labels -------------------------------------------------------
-        self.x_axis_label = tk.Label(bottomleftframe, text = "X-Axis: ")
+        self.x_axis_label = tk.Label(middleleftframe, text = "X-Axis: ")
         self.x_axis_label.pack(side = tk.LEFT)
-        self.y_axis_label = tk.Label(bottommiddleframe, text = "Y-Axis: ")
+        self.y_axis_label = tk.Label(middlerightframe, text = "Y-Axis: ")
         self.y_axis_label.pack(side = tk.LEFT)
 
+        self.x_axis_title_label = tk.Label(bottomleftframe, \
+                                           text = "X-Axis Title: ")
+        self.x_axis_title_label.pack(side = tk.LEFT)
+
+        # ---------------- entry -------------------------------------------------------
+        self.x_axis_title = tk.StringVar()
+        self.x_axis_title_entry = tk.Entry(bottomleftframe, \
+                                        textvariable = self.x_axis_title)
+        self.x_axis_title_entry.pack(side = tk.LEFT)
+        
         # ---------------- drop down menus ----------------------------------------------
         # X-Axis:
-        self.selected_x_axis = tk.StringVar(bottomleftframe) #track what x_axis_menu is set to
+        self.selected_x_axis = tk.StringVar(middleleftframe) #track what x_axis_menu is set to
         self.x_axis_options = [None]
         self.selected_x_axis.set(self.x_axis_options[0])
-        self.x_axis_menu = tk.OptionMenu(bottomleftframe, self.selected_x_axis, \
+        self.x_axis_menu = tk.OptionMenu(middleleftframe, self.selected_x_axis, \
                                          *self.x_axis_options)
         self.x_axis_menu.pack(side = tk.LEFT)
 
         # Y-Axis
-        self.selected_y_axis = tk.StringVar(bottommiddleframe) #track what y_axis_menu is set to
+        self.selected_y_axis = tk.StringVar(middlerightframe) #track what y_axis_menu is set to
         self.y_axis_options = [None]
         self.selected_y_axis.set(self.y_axis_options[0])
-        self.y_axis_menu = tk.OptionMenu(bottommiddleframe, self.selected_y_axis, \
+        self.y_axis_menu = tk.OptionMenu(middlerightframe, self.selected_y_axis, \
                                          *self.y_axis_options)
         self.y_axis_menu.pack(side = tk.LEFT)
         
@@ -77,6 +90,7 @@ class DataAnimationGui:
         TABLE = self.get_df() # dataframe from file chosen in gui
         usr_x_axis = self.selected_x_axis.get() # x_axis chosen in gui
         usr_y_axis = self.selected_y_axis.get() # y_axis chosen in gui
+        usr_x_axis_title = self.x_axis_title.get() # x_axis title from gui
         # end of gui access ------------------------------------------------------------
 
         # convert to TIME series to int for handling purposes
@@ -100,8 +114,9 @@ class DataAnimationGui:
         xs = [] # initialized lists to pass to animate()
         ys = []
         ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
-                                      fargs = (xs, ys, usr_x_axis, usr_y_axis, fig, \
-                                               ax1, TABLE), repeat = False)
+                                      fargs = (xs, ys, usr_x_axis, usr_x_axis_title, \
+                                               usr_y_axis, fig, ax1, TABLE), \
+                                               repeat = False)
 
         #all rc settings are stored in a dictionary-like variable called
         #matplotlib.rcParams, which is global to the matplotlib package
@@ -164,7 +179,8 @@ def data_for_animate(time, x_axis, y_axis, df):
     
     return x, y
 
-def animate(interval, xs, ys, x_axis, y_axis, figure, subplot, data_frame):
+def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, figure, subplot, \
+            data_frame):
     """plot data from data_frame on subplot as of time = 'interval'
        xs = []
        ys = []
@@ -181,7 +197,7 @@ def animate(interval, xs, ys, x_axis, y_axis, figure, subplot, data_frame):
         ys.append(Y)
         subplot.clear() # clear the subplot
         subplot.plot(xs, ys)
-        subplot.set_xlabel('Crosshead Displacement (in)', fontweight = 'bold')
+        subplot.set_xlabel(x_axis_title, fontweight = 'bold')
         subplot.set_ylabel('Force (lbs)', fontweight = 'bold')
         #https://stackoverflow.com/questions/30787901/how-to-get-a-value-from-a-pandas-dataframe-and-not-the-index-and-object-type
         subplot.set_title(str(data_frame[data_frame.TIME == time].TIME.item()) \
