@@ -215,8 +215,8 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, \
         # then convert to string
         subplot.set_title(str(list(data_frame[data_frame.TIME == time].TIME.items())[0][1]) \
                           + 's', fontweight = 'bold')
-        figure.savefig('Output_Images/' + \
-                    str(list(data_frame[data_frame.TIME == time].TIME.items())[0][1]) + '.png')
+    # save figure EVERY time animate() is called
+    figure.savefig('Output_Images/' + str(time) + '.png')
     return
 
 if __name__ == "__main__":
