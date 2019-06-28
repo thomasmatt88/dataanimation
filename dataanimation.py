@@ -185,13 +185,11 @@ def data_for_animate(time, x_axis, y_axis, df):
     "returns xs and ys from df as of 'time' to be plotted in 'animate'"
     X_series = df[df.TIME == time][x_axis] # linked to gui
     X_list = X_series.tolist()
-    x = X_list[0]
 
     Y_series = df[df.TIME == time][y_axis] # linked to gui
     Y_list = Y_series.tolist()
-    y = Y_list[0]
     
-    return x, y
+    return X_list, Y_list
 
 def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, \
             figure, subplot, data_frame):
@@ -207,10 +205,10 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, \
 
     if time in data_frame.TIME.unique(): # if 'time' is a datapoint in df then plot data
         X, Y = data_for_animate(time, x_axis, y_axis, data_frame)
-        xs.append(X)
-        ys.append(Y)
+        xs.extend(X) #extend list X to end of list xs
+        ys.extend(Y)
         subplot.clear() # clear the subplot
-        subplot.plot(xs, ys)
+        subplot.scatter(xs, ys)
         subplot.set_xlabel(x_axis_title, fontweight = 'bold')
         subplot.set_ylabel(y_axis_title, fontweight = 'bold')
         # DataFrame.items() returns zip object. Convert to list, access [0][1],
