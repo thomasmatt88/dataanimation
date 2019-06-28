@@ -114,12 +114,13 @@ class DataAnimationGui:
             TABLE = self.get_df() # dataframe from file chosen in gui
             usr_x_axis = self.selected_x_axis.get() # x_axis chosen in gui
             usr_y_axis = self.selected_y_axis.get() # y_axis chosen in gui
+            usr_t_axis = self.selected_t_axis.get() # t_axis chosen in gui
             usr_x_axis_title = self.x_axis_title.get() # x_axis title from gui
             usr_y_axis_title = self.y_axis_title.get() # y_axis title from gui
             # end of gui access ------------------------------------------------------------
 
-            # convert to TIME series to int for handling purposes
-            TABLE.TIME = TABLE.TIME.astype(int)
+            # convert to time series to int for handling purposes
+            TABLE[usr_t_axis] = TABLE[usr_t_axis].astype(int)
             # Set up the empty figure and subplot we want to animate on
             fig = plt.figure()
             ax1 = fig.add_subplot(1,1,1)
@@ -129,7 +130,7 @@ class DataAnimationGui:
             #from Data.csv
             #for some reason 0 is called twice so we need to add an extra frame in order
             #to get last data point
-            FRAMES = TABLE.TIME.astype(int).max() + 1
+            FRAMES = TABLE[usr_t_axis].astype(int).max() + 1
 
             #FuncAnimation will animate to 'fig' based on function passed to it
             #called 'animate'. Every 'interval' (1000 ms) 'animate' will be called.
@@ -140,8 +141,8 @@ class DataAnimationGui:
             ys = []
             ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
                                           fargs = (xs, ys, usr_x_axis, usr_x_axis_title,
-                                                   usr_y_axis, usr_y_axis_title, fig, ax1, \
-                                                   TABLE), repeat = False)
+                                                   usr_y_axis, usr_y_axis_title, usr_t_axis, \
+                                                   fig, ax1, TABLE), repeat = False)
 
             #all rc settings are stored in a dictionary-like variable called
             #matplotlib.rcParams, which is global to the matplotlib package
@@ -207,17 +208,17 @@ class DataAnimationGui:
     def get_df(self):
         return self.df
 
-def data_for_animate(time, x_axis, y_axis, df):
+def data_for_animate(time, x_axis, y_axis, t_axis, df):
     "returns xs and ys from df as of 'time' to be plotted in 'animate'"
-    X_series = df[df.TIME == time][x_axis] # linked to gui
+    X_series = df[df[t_axis] == time][x_axis] # linked to gui
     X_list = X_series.tolist()
 
-    Y_series = df[df.TIME == time][y_axis] # linked to gui
+    Y_series = df[df[t_axis] == time][y_axis] # linked to gui
     Y_list = Y_series.tolist()
     
     return X_list, Y_list
 
-def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, \
+def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, t_axis, \
             figure, subplot, data_frame):
     """plot data from data_frame on subplot as of time = 'interval'
        xs = []
@@ -229,8 +230,8 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, \
     time = interval #interval is number of times 'animate' has been called
                     #by FuncAnimation
 
-    if time in data_frame.TIME.unique(): # if 'time' is a datapoint in df then plot data
-        X, Y = data_for_animate(time, x_axis, y_axis, data_frame)
+    if time in data_frame[t_axis].unique(): # if 'time' is a datapoint in df then plot data
+        X, Y = data_for_animate(time, x_axis, y_axis, t_axis, data_frame)
         xs.extend(X) #extend list X to end of list xs
         ys.extend(Y)
         subplot.clear() # clear the subplot
@@ -239,7 +240,7 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, \
         subplot.set_ylabel(y_axis_title, fontweight = 'bold')
         # DataFrame.items() returns zip object. Convert to list, access [0][1],
         # then convert to string
-        subplot.set_title(str(list(data_frame[data_frame.TIME == time].TIME.items())[0][1]) \
+        subplot.set_title(str(list(data_frame[data_frame[t_axis] == time][t_axis].items())[0][1]) \
                           + 's', fontweight = 'bold')
     # save figure EVERY time animate() is called
     figure.savefig('Output_Images/' + str(time) + '.png')
