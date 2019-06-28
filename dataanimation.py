@@ -205,7 +205,7 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, \
     time = interval #interval is number of times 'animate' has been called
                     #by FuncAnimation
 
-    if time in data_frame.TIME.unique(): 
+    if time in data_frame.TIME.unique(): # if 'time' is a datapoint in df then plot data
         X, Y = data_for_animate(time, x_axis, y_axis, data_frame)
         xs.append(X)
         ys.append(Y)
@@ -213,11 +213,12 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, \
         subplot.plot(xs, ys)
         subplot.set_xlabel(x_axis_title, fontweight = 'bold')
         subplot.set_ylabel(y_axis_title, fontweight = 'bold')
-        #https://stackoverflow.com/questions/30787901/how-to-get-a-value-from-a-pandas-dataframe-and-not-the-index-and-object-type
-        subplot.set_title(str(data_frame[data_frame.TIME == time].TIME.item()) \
+        # DataFrame.items() returns zip object. Convert to list, access [0][1],
+        # then convert to string
+        subplot.set_title(str(list(data_frame[data_frame.TIME == time].TIME.items())[0][1]) \
                           + 's', fontweight = 'bold')
         figure.savefig('Output_Images/' + \
-                    str(data_frame[data_frame.TIME == time].TIME.item()) + '.png')
+                    str(list(data_frame[data_frame.TIME == time].TIME.items())[0][1]) + '.png')
     return
 
 if __name__ == "__main__":
