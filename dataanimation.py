@@ -92,8 +92,6 @@ class DataAnimationGui:
         self.set_x_axis_menu()
         self.set_y_axis_options(list(self.df.columns.values))
         self.set_y_axis_menu()
-        global TABLE
-        TABLE = self.df
 
     def create_animation(self):
         # start of gui access ----------------------------------------------------------
