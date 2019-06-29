@@ -107,10 +107,10 @@ class DataAnimationGui:
                 self.df = pandas.read_csv(self.data_file_path)
             except:
                 try:
-                    self.df = pandas.read_excel(self.data_file_path)
+                    self.df = pandas.read_excel(self.data_file_path.name)
                 except:
                     raise
-        except:
+        except Exception as e:
             messagebox.showinfo(message = "Error: Did you choose proper " + \
                                 "file type (Excel or csv)?")
         try:
