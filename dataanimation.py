@@ -103,13 +103,23 @@ class DataAnimationGui:
         "open file and update df and menu options"
         try:
             self.data_file_path = tk.filedialog.askopenfile()
-            self.df = pandas.read_csv(self.data_file_path)
+            try:
+                self.df = pandas.read_csv(self.data_file_path)
+            except:
+                try:
+                    self.df = pandas.read_excel(self.data_file_path)
+                except:
+                    raise
+        except:
+            messagebox.showinfo(message = "Error: Did you choose proper " + \
+                                "file type (Excel or csv)?")
+        try:
             self.set_x_axis_options(list(self.df.columns.values))
             self.set_x_axis_menu()
             self.set_y_axis_options(list(self.df.columns.values))
             self.set_y_axis_menu()
             self.set_t_axis_options(list(self.df.columns.values))
-            self.set_t_axis_menu()
+            self.set_t_axis_menu()           
         except:
             pass
 
@@ -161,7 +171,7 @@ class DataAnimationGui:
                 print(e)
         except:
             messagebox.showinfo(message = "Error: Did you choose X-axis " + \
-                                " and Y-axis from dropdown menus?")
+                                " Y-axis, and Time-axis from dropdown menus?")
 
     # mutators --------------------------------------------------------------------------
     def set_x_axis_options(self, user_list):
