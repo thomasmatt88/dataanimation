@@ -14,6 +14,7 @@ def main():
 class DataAnimationGui:
     def __init__(self, master):
         self.data_file_path = ""
+        self.save_folder_path = ""
         self.df = pandas.DataFrame()
         
         # --------------- frames --------------------------------------------------------
@@ -40,6 +41,9 @@ class DataAnimationGui:
         self.fileButton = tk.Button(topframe, text = "Open File", \
                                     command = self.fileopen)
         self.fileButton.pack(side = tk.LEFT)
+        self.saveButton = tk.Button(topframe, text = "Save to Folder", \
+                                    command = self.savefolder)
+        self.saveButton.pack(side = tk.LEFT)
         self.createButton = tk.Button(topframe, text = "Create Animation", \
                                       command = self.create_animation)
         self.createButton.pack(side = tk.LEFT)
@@ -123,6 +127,10 @@ class DataAnimationGui:
         except:
             pass
 
+    def savefolder(self):
+        "choose folder to save images too"
+        self.save_folder_path = tk.filedialog.askdirectory()
+
     def create_animation(self):
         try:
             # start of gui access ----------------------------------------------------------
@@ -157,7 +165,8 @@ class DataAnimationGui:
             ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
                                           fargs = (xs, ys, usr_x_axis, usr_x_axis_title,
                                                    usr_y_axis, usr_y_axis_title, usr_t_axis, \
-                                                   fig, ax1, TABLE), repeat = False)
+                                                   fig, ax1, TABLE, self.save_folder_path), \
+                                                    repeat = False)
 
             #all rc settings are stored in a dictionary-like variable called
             #matplotlib.rcParams, which is global to the matplotlib package
@@ -234,7 +243,7 @@ def data_for_animate(time, x_axis, y_axis, t_axis, df):
     return X_list, Y_list
 
 def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, t_axis, \
-            figure, subplot, data_frame):
+            figure, subplot, data_frame, folder_path):
     """plot data from data_frame on subplot as of time = 'interval'
        xs = []
        ys = []
@@ -258,7 +267,10 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, t_axis
         subplot.set_title(str(list(data_frame[data_frame[t_axis] == time][t_axis].items())[0][1]) \
                           + 's', fontweight = 'bold')
     # save figure EVERY time animate() is called
-    figure.savefig('Output_Images/' + str(time) + '.png')
+    try:
+        figure.savefig(str(folder_path) + '/' + str(time) + '.png')
+    except:
+        figure.savefig(str(time) + '.png')
     return
 
 if __name__ == "__main__":
