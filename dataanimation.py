@@ -16,6 +16,7 @@ class DataAnimationGui:
         self.data_file_path = ""
         self.save_folder_path = ""
         self.df = pandas.DataFrame()
+        master.wm_title("Easy Data Animation")
         
         # --------------- frames --------------------------------------------------------
         topframe = tk.Frame(master)
