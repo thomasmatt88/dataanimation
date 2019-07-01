@@ -118,6 +118,9 @@ class DataAnimationGui:
         except Exception as e:
             messagebox.showinfo(message = "Error: Did you choose proper " + \
                                 "file type (Excel or csv)?")
+        self.update_dropdown_menus()
+            
+    def update_dropdown_menus(self):
         try:
             self.set_x_axis_options(list(self.df.columns.values))
             self.set_x_axis_menu()
