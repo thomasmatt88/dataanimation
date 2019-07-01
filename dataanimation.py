@@ -143,9 +143,13 @@ class DataAnimationGui:
             usr_y_axis_title = self.y_axis_title.get() # y_axis title from gui
             # end of gui access ------------------------------------------------------------
 
-            # convert to time series to int for handling purposes. 
-            TABLE.loc[:, 'TIME'] = pandas.to_numeric(TABLE['TIME'], errors = 'coerce')
-            TABLE.dropna(subset = [usr_t_axis], inplace = True) # dropna without create df copy
+            # clean relevant series of data that can't be converted to numeric
+            TABLE.loc[:, usr_t_axis] = pandas.to_numeric(TABLE[usr_t_axis], errors = 'coerce')
+            TABLE.loc[:, usr_x_axis] = pandas.to_numeric(TABLE[usr_x_axis], errors = 'coerce')
+            TABLE.loc[:, usr_y_axis] = pandas.to_numeric(TABLE[usr_y_axis], errors = 'coerce')
+            TABLE.dropna(subset = [usr_t_axis, usr_x_axis, usr_y_axis], \
+                         inplace = True) # dropna values without create df copy
+            # convert time series to int for handling purposes. 
             TABLE[usr_t_axis] = TABLE[usr_t_axis].astype(int)
             # Set up the empty figure and subplot we want to animate on
             fig = plt.figure()
