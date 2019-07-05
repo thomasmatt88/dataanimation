@@ -146,12 +146,28 @@ class DataAnimationGui:
             usr_y_axis_title = self.y_axis_title.get() # y_axis title from gui
             # end of gui access ------------------------------------------------------------
 
-            # clean relevant series of data that can't be converted to numeric
+            # clean relevant series of data that can't be converted to numeric -------------
             TABLE.loc[:, usr_t_axis] = pandas.to_numeric(TABLE[usr_t_axis], errors = 'coerce')
-            TABLE.loc[:, usr_x_axis] = pandas.to_numeric(TABLE[usr_x_axis], errors = 'coerce')
-            TABLE.loc[:, usr_y_axis] = pandas.to_numeric(TABLE[usr_y_axis], errors = 'coerce')
-            TABLE.dropna(subset = [usr_t_axis, usr_x_axis, usr_y_axis], \
-                         inplace = True) # dropna values without create df copy
+            try: # user is not required to choose both x-axis and y-axis
+                TABLE.loc[:, usr_x_axis] = pandas.to_numeric(TABLE[usr_x_axis], errors = 'coerce')
+            except:
+                pass
+            try:
+                TABLE.loc[:, usr_y_axis] = pandas.to_numeric(TABLE[usr_y_axis], errors = 'coerce')
+            except:
+                pass
+            try:
+                TABLE.dropna(subset = [usr_t_axis, usr_x_axis, usr_y_axis], \
+                             inplace = True) # dropna values without create df copy
+            except:
+                try:
+                    TABLE.dropna(subset = [usr_t_axis, usr_x_axis], \
+                             inplace = True) # dropna values without create df copy
+                except:
+                    TABLE.dropna(subset = [usr_t_axis, usr_y_axis], \
+                             inplace = True) # dropna values without create df copy
+            # end of cleaning series --------------------------------------------------------
+                    
             # convert time series to int for handling purposes. 
             TABLE[usr_t_axis] = TABLE[usr_t_axis].astype(int)
             # Set up the empty figure and subplot we want to animate on
@@ -189,8 +205,8 @@ class DataAnimationGui:
             except Exception as e:
                 print(e)
         except:
-            messagebox.showinfo(message = "Error: Did you choose X-axis " + \
-                                " Y-axis, and Time-axis from dropdown menus?")
+            messagebox.showinfo(message = "Error: Must choose Time-axis" + \
+                                " and either X-axis or Y-axis from dropdown menus.")
 
     # mutators --------------------------------------------------------------------------
     def set_x_axis_options(self, user_list):
@@ -244,10 +260,16 @@ class DataAnimationGui:
 
 def data_for_animate(time, x_axis, y_axis, t_axis, df):
     "returns xs and ys from df as of 'time' to be plotted in 'animate'"
-    X_series = df[df[t_axis] == time][x_axis] # linked to gui
+    try: # if x-axis wasn't chosen by user, then use index
+        X_series = df[df[t_axis] == time][x_axis] # linked to gui
+    except:
+        X_series = df[df[t_axis] == time].index
     X_list = X_series.tolist()
 
-    Y_series = df[df[t_axis] == time][y_axis] # linked to gui
+    try: # if y-axis wasn't chosen by user, then use index
+        Y_series = df[df[t_axis] == time][y_axis] # linked to gui
+    except:
+        Y_series = df[df[t_axis] == time].index
     Y_list = Y_series.tolist()
     
     return X_list, Y_list
