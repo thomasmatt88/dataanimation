@@ -168,8 +168,8 @@ class DataAnimationGui:
                              inplace = True) # dropna values without create df copy
             # end of cleaning series --------------------------------------------------------
                     
-            # convert time series to int for handling purposes. 
-            TABLE[usr_t_axis] = TABLE[usr_t_axis].astype(int)
+            # convert time series to float with 2 decimals for handling purposes. 
+            TABLE[usr_t_axis] = round(TABLE[usr_t_axis].astype(float), 1)
             # Set up the empty figure and subplot we want to animate on
             fig = plt.figure()
             ax1 = fig.add_subplot(1,1,1)
@@ -179,16 +179,17 @@ class DataAnimationGui:
             #from Data.csv
             #for some reason 0 is called twice so we need to add an extra frame in order
             #to get last data point
-            FRAMES = TABLE[usr_t_axis].astype(int).max() + 1
+            #multiply by 100 to for 2 decimal point precision
+            FRAMES = (TABLE[usr_t_axis].astype(int).max() + 1)*10
 
             #FuncAnimation will animate to 'fig' based on function passed to it
-            #called 'animate'. Every 'interval' (1000 ms) 'animate' will be called.
+            #called 'animate'. Every 'interval' (100 ms) 'animate' will be called.
             #'interval' is also the delay between 'frames'.
             #'repeat' = False because we don't want animation to repeat when the sequence of
             #'frames' is completed.
             xs = [] # initialized lists to pass to animate()
             ys = []
-            ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
+            ani = animation.FuncAnimation(fig, animate, interval = 100, frames = FRAMES, \
                                           fargs = (xs, ys, usr_x_axis, usr_x_axis_title,
                                                    usr_y_axis, usr_y_axis_title, usr_t_axis, \
                                                    fig, ax1, TABLE, self.save_folder_path), \
@@ -199,9 +200,9 @@ class DataAnimationGui:
             try:
                 plt.show() # plt.show() has to be before ani.save() in order to work
                 # must have plt.show() for fig.savefig() to work in animate()
-                plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
-                writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
-                ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
+#                plt.rcParams['animation.ffmpeg_path'] = '/usr/local/bin/ffmpeg'
+#                writer = animation.FFMpegWriter(fps = 1) #frame rate for movie = 1 frame/sec
+#                ani.save('dataanimation.mp4', writer = writer) #specify MovieWriter = writer
             except Exception as e:
                 print(e)
         except:
@@ -283,8 +284,8 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, t_axis
                       will plot against each other 
     """
 
-    time = interval #interval is number of times 'animate' has been called
-                    #by FuncAnimation
+    time = interval/10 #interval is number of times 'animate' has been called
+                         #by FuncAnimation
 
     if time in data_frame[t_axis].unique(): # if 'time' is a datapoint in df then plot data
         X, Y = data_for_animate(time, x_axis, y_axis, t_axis, data_frame)
@@ -298,12 +299,13 @@ def animate(interval, xs, ys, x_axis, x_axis_title, y_axis, y_axis_title, t_axis
         # then convert to string
         subplot.set_title(str(list(data_frame[data_frame[t_axis] == time][t_axis].items())[0][1]) \
                           + 's', fontweight = 'bold')
-    # save figure EVERY time animate() is called
-    try:
-        figure.savefig(str(folder_path) + '/' + str(time) + '.png')
-    except:
-        figure.savefig(str(time) + '.png')
-    return
+        # save figure EVERY time animate() is called and 'time' is a datapoint in df
+        try:
+            figure.savefig(str(folder_path) + '/' + str(time) + '.png')
+        except:
+            figure.savefig(str(time) + '.png')
+        return
+
 
 if __name__ == "__main__":
     main()
