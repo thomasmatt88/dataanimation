@@ -4,7 +4,11 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import pandas
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
+
+# custom modules
+from videotimestamp import videotimestamp
 
 def main():
     root_win = tk.Tk()
@@ -17,12 +21,34 @@ class DataAnimationGui:
         self.save_folder_path = ""
         self.df = pandas.DataFrame()
         master.wm_title("Easy Data Animation")
+
+        # --------------- tabs -------------------------------------------------
+        tabControl = ttk.Notebook(master)
+        tab1 = ttk.Frame(tabControl)
+        tabControl.add(tab1, text = "Easy Data Animation")
+        tab2 = ttk.Frame(tabControl)
+        tabControl.add(tab2, text = "Video Overlay")
+        tabControl.pack(expand = 1, fill = "both")
+
+        # --------------- data overlay frame -----------------------------------
+        self.videofileButton = tk.Button(tab2, text = "Open Video File", \
+                                    command = self.videofileopen)
+        self.videofileButton.pack(side = tk.LEFT)
+        
+        self.t_stamp_label = tk.Label(tab2, text = "Time-Stamp: ", fg = "blue")
+        self.t_stamp_label.pack(side = tk.LEFT)
+
+        self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+        self.time_stamp_entry = tk.Entry(tab2, \
+                                        textvariable = self.time_stamp)
+        self.time_stamp_entry.pack(side = tk.LEFT)
+
         
         # --------------- frames --------------------------------------------------------
-        topframe = tk.Frame(master)
+        topframe = tk.Frame(tab1)
         topframe.pack(fill = tk.X, side = tk.TOP)
         #topframe.configure(background = "gray")
-        middleframe = tk.Frame(master)
+        middleframe = tk.Frame(tab1)
         middleframe.pack(fill = tk.X, side = tk.TOP)
         middleleftframe = tk.Frame(middleframe)
         middleleftframe.pack(side = tk.LEFT)
@@ -30,7 +56,7 @@ class DataAnimationGui:
         middlemiddleframe.pack(side = tk.LEFT)
         middlerightframe = tk.Frame(middleframe)
         middlerightframe.pack(side = tk.LEFT)
-        bottomframe = tk.Frame(master)
+        bottomframe = tk.Frame(tab1)
         bottomframe.pack(fill = tk.X, side = tk.TOP)
         bottomleftframe = tk.Frame(bottomframe)
         bottomleftframe.pack(side = tk.LEFT)
@@ -101,8 +127,18 @@ class DataAnimationGui:
         self.selected_t_axis.set(self.t_axis_options[0])
         self.t_axis_menu = tk.OptionMenu(middlerightframe, self.selected_t_axis, \
                                          *self.t_axis_options)
-        self.t_axis_menu.pack(side = tk.LEFT)       
+        self.t_axis_menu.pack(side = tk.LEFT)
         
+    # tab2 helper -----------------------------------------------------------------------
+    def videofileopen(self):
+        print(self.time_stamp.get())
+        v = 'Sample9.mov'
+        # use videotimestamp method from videotimestamp module
+        self.time_stamp.set(str(videotimestamp(v))) #videotimestamp returns datetime.datetime object
+        #self.time_stamp_entry.delete(0, tk.END)
+        #self.time_stamp_entry.insert(0, self.time_stamp)
+        print(self.time_stamp.get())
+    
     # helpers ---------------------------------------------------------------------------
     def fileopen(self):
         "open file and update df and menu options"
