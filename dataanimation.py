@@ -6,6 +6,7 @@ import pandas
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter.filedialog import askopenfilename
 
 # custom modules
 from videotimestamp import videotimestamp
@@ -21,6 +22,9 @@ class DataAnimationGui:
         self.save_folder_path = ""
         self.df = pandas.DataFrame()
         master.wm_title("Easy Data Animation")
+
+        # --------------- data overlay attributes ------------------------------
+        self.video_file_path = ""
 
         # --------------- tabs -------------------------------------------------
         tabControl = ttk.Notebook(master)
@@ -132,11 +136,14 @@ class DataAnimationGui:
     # tab2 helper -----------------------------------------------------------------------
     def videofileopen(self):
         print(self.time_stamp.get())
-        v = 'Sample9.mov'
-        # use videotimestamp method from videotimestamp module
-        self.time_stamp.set(str(videotimestamp(v))) #videotimestamp returns datetime.datetime object
-        #self.time_stamp_entry.delete(0, tk.END)
-        #self.time_stamp_entry.insert(0, self.time_stamp)
+        try:
+            v = askopenfilename()
+            # use videotimestamp method from videotimestamp module
+            self.time_stamp.set(str(videotimestamp(v))) #videotimestamp returns datetime.datetime object
+            #self.time_stamp_entry.delete(0, tk.END)
+            #self.time_stamp_entry.insert(0, self.time_stamp)
+        except Exception as e:
+            messagebox.showinfo(message = "Error: Did you choose a proper file type?")
         print(self.time_stamp.get())
     
     # helpers ---------------------------------------------------------------------------
