@@ -4,8 +4,6 @@ import re
 from datetime import datetime
 
 def videotimestamp(video_file_path):
-    
-    #video_file_path = 'Sample9.mov'
 
     #extract metadata from video file
     parser = createParser(video_file_path)

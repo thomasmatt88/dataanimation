@@ -10,6 +10,7 @@ from tkinter.filedialog import askopenfilename
 
 # custom modules
 from videotimestamp import videotimestamp
+from videotrim import trim_start
 
 def main():
     root_win = tk.Tk()
@@ -25,6 +26,7 @@ class DataAnimationGui:
 
         # --------------- data overlay attributes ------------------------------
         self.video_file_path = ""
+        self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
 
         # --------------- tabs -------------------------------------------------
         tabControl = ttk.Notebook(master)
@@ -39,10 +41,16 @@ class DataAnimationGui:
                                     command = self.videofileopen)
         self.videofileButton.pack(side = tk.LEFT)
         
+        self.trimvideoButton = tk.Button(tab2, text = "Trim Video", \
+                                    command = lambda: \
+                                              trim_start(self.time_stamp.get(), \
+                                                             self.video_file_path))
+        self.trimvideoButton.pack(side = tk.LEFT)       
+        
         self.t_stamp_label = tk.Label(tab2, text = "Time-Stamp: ", fg = "blue")
         self.t_stamp_label.pack(side = tk.LEFT)
 
-        self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+        #self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
         self.time_stamp_entry = tk.Entry(tab2, \
                                         textvariable = self.time_stamp)
         self.time_stamp_entry.pack(side = tk.LEFT)
@@ -135,16 +143,15 @@ class DataAnimationGui:
         
     # tab2 helper -----------------------------------------------------------------------
     def videofileopen(self):
-        print(self.time_stamp.get())
         try:
             v = askopenfilename()
             # use videotimestamp method from videotimestamp module
             self.time_stamp.set(str(videotimestamp(v))) #videotimestamp returns datetime.datetime object
             #self.time_stamp_entry.delete(0, tk.END)
             #self.time_stamp_entry.insert(0, self.time_stamp)
+            self.video_file_path = v
         except Exception as e:
             messagebox.showinfo(message = "Error: Did you choose a proper file type?")
-        print(self.time_stamp.get())
     
     # helpers ---------------------------------------------------------------------------
     def fileopen(self):
