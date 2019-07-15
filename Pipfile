@@ -15,6 +15,7 @@ pandas = "==0.19.2"
 xlrd = "==1.2.0"
 hachoir = "==3.0a5"
 moviepy = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.6"
