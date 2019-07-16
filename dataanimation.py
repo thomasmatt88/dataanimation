@@ -16,7 +16,46 @@ def main():
     root_win = tk.Tk()
     cls_ref = DataAnimationGui(root_win)
     root_win.mainloop()
-    
+
+class Tab2(ttk.Frame):
+    def __init__(self, master):
+        super().__init__()
+
+        # --------------- data overlay attributes ------------------------------
+        self.video_file_path = ""
+        self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+
+        # --------------- data overlay frame -----------------------------------
+        self.videofileButton = tk.Button(self, text = "Open Video File", \
+                                    command = self.videofileopen)
+        self.videofileButton.pack(side = tk.LEFT)
+        
+        self.trimvideoButton = tk.Button(self, text = "Trim Video", \
+                                    command = lambda: \
+                                              trim_start(self.time_stamp.get(), \
+                                                             self.video_file_path))
+        self.trimvideoButton.pack(side = tk.LEFT)       
+        
+        self.t_stamp_label = tk.Label(self, text = "Time-Stamp: ", fg = "blue")
+        self.t_stamp_label.pack(side = tk.LEFT)
+
+        #self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+        self.time_stamp_entry = tk.Entry(self, \
+                                        textvariable = self.time_stamp)
+        self.time_stamp_entry.pack(side = tk.LEFT)
+
+    # tab2 helper -----------------------------------------------------------------------
+    def videofileopen(self):
+        try:
+            v = askopenfilename()
+            # use videotimestamp method from videotimestamp module
+            self.time_stamp.set(str(videotimestamp(v))) #videotimestamp returns datetime.datetime object
+            #self.time_stamp_entry.delete(0, tk.END)
+            #self.time_stamp_entry.insert(0, self.time_stamp)
+            self.video_file_path = v
+        except Exception as e:
+            messagebox.showinfo(message = "Error: Did you choose a proper file type?")
+        
 class DataAnimationGui:
     def __init__(self, master):
         self.data_file_path = ""
@@ -24,37 +63,13 @@ class DataAnimationGui:
         self.df = pandas.DataFrame()
         master.wm_title("Easy Data Animation")
 
-        # --------------- data overlay attributes ------------------------------
-        self.video_file_path = ""
-        self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
-
         # --------------- tabs -------------------------------------------------
         tabControl = ttk.Notebook(master)
         tab1 = ttk.Frame(tabControl)
         tabControl.add(tab1, text = "Easy Data Animation")
-        tab2 = ttk.Frame(tabControl)
+        tab2 = Tab2(tabControl)
         tabControl.add(tab2, text = "Video Overlay")
         tabControl.pack(expand = 1, fill = "both")
-
-        # --------------- data overlay frame -----------------------------------
-        self.videofileButton = tk.Button(tab2, text = "Open Video File", \
-                                    command = self.videofileopen)
-        self.videofileButton.pack(side = tk.LEFT)
-        
-        self.trimvideoButton = tk.Button(tab2, text = "Trim Video", \
-                                    command = lambda: \
-                                              trim_start(self.time_stamp.get(), \
-                                                             self.video_file_path))
-        self.trimvideoButton.pack(side = tk.LEFT)       
-        
-        self.t_stamp_label = tk.Label(tab2, text = "Time-Stamp: ", fg = "blue")
-        self.t_stamp_label.pack(side = tk.LEFT)
-
-        #self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
-        self.time_stamp_entry = tk.Entry(tab2, \
-                                        textvariable = self.time_stamp)
-        self.time_stamp_entry.pack(side = tk.LEFT)
-
         
         # --------------- frames --------------------------------------------------------
         topframe = tk.Frame(tab1)
@@ -140,18 +155,6 @@ class DataAnimationGui:
         self.t_axis_menu = tk.OptionMenu(middlerightframe, self.selected_t_axis, \
                                          *self.t_axis_options)
         self.t_axis_menu.pack(side = tk.LEFT)
-        
-    # tab2 helper -----------------------------------------------------------------------
-    def videofileopen(self):
-        try:
-            v = askopenfilename()
-            # use videotimestamp method from videotimestamp module
-            self.time_stamp.set(str(videotimestamp(v))) #videotimestamp returns datetime.datetime object
-            #self.time_stamp_entry.delete(0, tk.END)
-            #self.time_stamp_entry.insert(0, self.time_stamp)
-            self.video_file_path = v
-        except Exception as e:
-            messagebox.showinfo(message = "Error: Did you choose a proper file type?")
     
     # helpers ---------------------------------------------------------------------------
     def fileopen(self):
