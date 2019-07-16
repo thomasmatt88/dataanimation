@@ -4,6 +4,10 @@ import numpy as np
 
 #https://stackoverflow.com/questions/30227466/combine-several-images-horizontally-with-python
 def combine_images(a, b):
+    """"combines two Pillow Images and returns one.
+    'a' on left - original size is preserved
+    'b' on right - original size is preserved """
+    
     images = [a, b]
     widths, heights = zip(*(i.size for i in images))
 
@@ -19,37 +23,29 @@ def combine_images(a, b):
 
     return new_im
 
+def overlay_video(figure, video_clip):
+    """places figure on left hand side of video_clip"""
+
+    new_frames = []
+
+    for frame in clip.iter_frames():
+        # convert frame to PIL image
+        a = Image.fromarray(frame)
+        # convert from PIL image to frame
+        a = combine_images(figure, a)
+        a = np.array(a)
+        new_frames.append(a)
+
+    new_clip = mpe.ImageSequenceClip(new_frames, fps = video_clip.fps)
+    #put audio back into new_clip
+    new_clip = new_clip.set_audio(video_clip.audio)
+    # quicktime does not support moviepy default codec
+    # therefore, sound is only heard if checked with VLC Media Player
+    return new_clip
 
 figure = Image.open("0.png")
-square_figure = figure.resize((100, 100))
-
-clip = mpe.VideoFileClip("Sample9.mp4")
-
-
-
-#print([frame[0, :, 0].max() for frame in clip.iter_frames()])
-
-#print(type(clip.get_frame(1)))
-
-#print(clip.get_frame(1).shape)
-
-new_frames = []
-
-for frame in clip.iter_frames():
-    # convert frame to PIL image
-    a = Image.fromarray(frame)
-    #a.paste(square_figure, (0, 0, 100, 100))
-    #a.show()
-    # convert from PIL image to frame
-    a = combine_images(figure, a)
-    a = np.array(a)
-    new_frames.append(a)
-
-new_clip = mpe.ImageSequenceClip(new_frames, fps = clip.fps)
-#put audio back into new_clip
-new_clip = new_clip.set_audio(clip.audio)
-# quicktime does not support moviepy default codec
-# therefore, sound is only heard if checked with VLC Media Player
+clip = mpe.VideoFileClip("IMG_3816.MOV")
+new_clip = overlay_video(figure, clip)
 new_clip.write_videofile("new_file.mp4")
     
 
