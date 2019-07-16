@@ -26,8 +26,23 @@ def trim_start(new_start_time, video_file_path):
         clip.rotation = 0
     clip.ffmpeg_params = ['-noautorotate'] #doesn't seem to do anything
     # trim clip
-    final_clip = clip.subclip(int(start_time_seconds))
+    final_clip = clip.subclip(t_start = int(start_time_seconds))
     save_video_clip(final_clip, "trim_test.mp4")
+
+def trim_end(new_end_time, video_file_path):
+
+    new_end_time = datetime.strptime(new_end_time, '%Y-%m-%d %H:%M:%S')
+    video_creation_datetime = videotimestamp(video_file_path)
+    end_time_seconds = (new_end_time - video_creation_datetime).total_seconds()
+    clip = mpe.VideoFileClip(video_file_path)
+    if clip.rotation == 90:
+        clip = clip.resize(clip.size[::-1])
+        clip.rotation = 0
+    clip.ffmpeg_params = ['-noautorotate'] #doesn't seem to do anything
+    # trim clip
+    final_clip = clip.subclip(t_start = 0, t_end = int(end_time_seconds))
+    save_video_clip(final_clip, "trim_test.mp4")
+    
 
 def save_video_clip(video_clip, file_name):
     """saves videoclip into file with optimal settings for youtube"""
