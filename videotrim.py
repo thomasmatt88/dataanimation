@@ -27,10 +27,14 @@ def trim_start(new_start_time, video_file_path):
     clip.ffmpeg_params = ['-noautorotate'] #doesn't seem to do anything
     # trim clip
     final_clip = clip.subclip(int(start_time_seconds))
+    save_video_clip(final_clip, "trim_test.mp4")
 
-    final_clip.ffmpeg_params = ['-noautorotate'] #doesn't seem to do anything
+def save_video_clip(video_clip, file_name):
+    """saves videoclip into file with optimal settings for youtube"""
+    
+    video_clip.ffmpeg_params = ['-noautorotate'] #doesn't seem to do anything
     # recommended settings for youtube
-    final_clip.write_videofile(filename = "utc_clip.mp4", \
+    video_clip.write_videofile(filename = file_name, \
                                       codec = "libx264", audio_codec = "aac")
                                     #bitrate = 10 Mbps for 30 FPS and 15 Mbps for 60 fps
    
