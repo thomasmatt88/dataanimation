@@ -31,8 +31,9 @@ def overlay_video(figure, video_clip):
     for frame in clip.iter_frames():
         # convert frame to PIL image
         a = Image.fromarray(frame)
-        # convert from PIL image to frame
+        # combine PIL images into one
         a = combine_images(figure, a)
+        # convert from PIL image to frame
         a = np.array(a)
         new_frames.append(a)
 
