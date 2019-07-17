@@ -10,7 +10,7 @@ from tkinter.filedialog import askopenfilename
 
 # custom modules
 from videotimestamp import videotimestamp, videoendtime
-from videotrim import trim_start
+from videotrim import trim_video
 
 def main():
     root_win = tk.Tk()
@@ -32,9 +32,10 @@ class Tab2(ttk.Frame):
         self.videofileButton.pack(side = tk.LEFT)
         
         self.trimvideoButton = tk.Button(self, text = "Trim Video", \
-                                    command = lambda: \
-                                              trim_start(self.time_stamp.get(), \
-                                                             self.video_file_path))
+                                         command = lambda: \
+                                         self.trim_helper(self.time_stamp.get(), \
+                                                          self.time_stamp_end.get(), \
+                                                          self.video_file_path))
         self.trimvideoButton.pack(side = tk.LEFT)       
         
         self.st_stamp_label = tk.Label(self, text = "Start-Time: ", fg = "blue")
@@ -54,6 +55,14 @@ class Tab2(ttk.Frame):
         self.etime_stamp_entry.pack(side = tk.LEFT)     
 
     # tab2 helper -----------------------------------------------------------------------
+    def trim_helper(self, start_time, end_time, video_file_path):
+        try:
+            trim_video(start_time, end_time, video_file_path)
+        except ValueError:
+            messagebox.showinfo(message = "Error: Did you use proper time stamp format?")
+        #except Exception as e:
+            #print(e)
+    
     def videofileopen(self):
         try:
             v = askopenfilename()
