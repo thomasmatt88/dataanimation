@@ -17,6 +17,21 @@ def main():
     cls_ref = DataAnimationGui(root_win)
     root_win.mainloop()
 
+class Tab3(ttk.Frame):
+    def __init__(self, master):
+        super().__init__()
+        self.data_time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+
+        # --------------- labels -----------------------------------------------
+        self.dt_stamp_label = tk.Label(self, text = "Data Start-Time: ", fg = "blue")
+        self.dt_stamp_label.pack(side = tk.LEFT)
+
+        # --------------- entry -----------------------------------------------
+        self.dtime_stamp_entry = tk.Entry(self, \
+                                        textvariable = self.data_time_stamp)
+        self.dtime_stamp_entry.pack(side = tk.LEFT)
+        
+        
 class Tab2(ttk.Frame):
     def __init__(self, master):
         super().__init__()
@@ -87,7 +102,9 @@ class DataAnimationGui:
         tab1 = ttk.Frame(tabControl)
         tabControl.add(tab1, text = "Easy Data Animation")
         tab2 = Tab2(tabControl)
-        tabControl.add(tab2, text = "Video Overlay")
+        tabControl.add(tab2, text = "Video Upload/Trim")
+        tab3 = Tab3(tabControl)
+        tabControl.add(tab3, text = "Data Animation and Video Sync")
         tabControl.pack(expand = 1, fill = "both")
         
         # --------------- frames --------------------------------------------------------
