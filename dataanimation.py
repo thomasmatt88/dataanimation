@@ -21,7 +21,8 @@ class Tab3(ttk.Frame):
     def __init__(self, master, controller):
         super().__init__()
         self.controller = controller
-        self.data_time_stamp = tk.StringVar(value = self.controller.shared_data["test"].get())
+        #self.data_time_stamp = tk.StringVar(value = self.controller.shared_data["test"].get())
+        self.data_time_stamp = self.controller.shared_data["test"]
 
         # --------------- labels -----------------------------------------------
         self.dt_stamp_label = tk.Label(self, text = "Data Start-Time: ", fg = "blue")
@@ -94,7 +95,7 @@ class Tab2(ttk.Frame):
 class DataAnimationGui:
     def __init__(self, master):
         self.shared_data = {"test": tk.StringVar()}
-        self.shared_data["test"].set("test")
+        self.shared_data["test"].set("%Y-%M-%D %H:%M:%S")
         
         self.data_file_path = ""
         self.save_folder_path = ""
@@ -201,6 +202,7 @@ class DataAnimationGui:
         "open file and update df and menu options"
         try:
             self.data_file_path = tk.filedialog.askopenfile()
+            self.shared_data["test"].set(self.data_file_path)
             try:
                 self.df = pandas.read_csv(self.data_file_path)
             except:
