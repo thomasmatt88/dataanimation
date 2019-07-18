@@ -18,9 +18,10 @@ def main():
     root_win.mainloop()
 
 class Tab3(ttk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, controller):
         super().__init__()
-        self.data_time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+        self.controller = controller
+        self.data_time_stamp = tk.StringVar(value = self.controller.shared_data["test"].get())
 
         # --------------- labels -----------------------------------------------
         self.dt_stamp_label = tk.Label(self, text = "Data Start-Time: ", fg = "blue")
@@ -92,6 +93,9 @@ class Tab2(ttk.Frame):
         
 class DataAnimationGui:
     def __init__(self, master):
+        self.shared_data = {"test": tk.StringVar()}
+        self.shared_data["test"].set("test")
+        
         self.data_file_path = ""
         self.save_folder_path = ""
         self.df = pandas.DataFrame()
@@ -103,7 +107,7 @@ class DataAnimationGui:
         tabControl.add(tab1, text = "Easy Data Animation")
         tab2 = Tab2(tabControl)
         tabControl.add(tab2, text = "Video Upload/Trim")
-        tab3 = Tab3(tabControl)
+        tab3 = Tab3(tabControl, self)
         tabControl.add(tab3, text = "Data Animation and Video Sync")
         tabControl.pack(expand = 1, fill = "both")
         
