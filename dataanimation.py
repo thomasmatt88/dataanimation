@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
+from datafilemeta import creationdate
 
 # custom modules
 from videotimestamp import videotimestamp, videoendtime
@@ -22,7 +23,7 @@ class Tab3(ttk.Frame):
         super().__init__()
         self.controller = controller
         #self.data_time_stamp = tk.StringVar(value = self.controller.shared_data["test"].get())
-        self.data_time_stamp = self.controller.shared_data["test"]
+        self.data_time_stamp = self.controller.shared_data["data_file_creation"]
 
         # --------------- labels -----------------------------------------------
         self.dt_stamp_label = tk.Label(self, text = "Data Start-Time: ", fg = "blue")
@@ -94,8 +95,8 @@ class Tab2(ttk.Frame):
         
 class DataAnimationGui:
     def __init__(self, master):
-        self.shared_data = {"test": tk.StringVar()}
-        self.shared_data["test"].set("%Y-%M-%D %H:%M:%S")
+        self.shared_data = {"data_file_creation": tk.StringVar()}
+        self.shared_data["data_file_creation"].set("%Y-%M-%D %H:%M:%S")
         
         self.data_file_path = ""
         self.save_folder_path = ""
@@ -202,12 +203,16 @@ class DataAnimationGui:
         "open file and update df and menu options"
         try:
             self.data_file_path = tk.filedialog.askopenfile()
-            self.shared_data["test"].set(self.data_file_path)
             try:
                 self.df = pandas.read_csv(self.data_file_path)
             except:
                 try:
                     self.df = pandas.read_excel(self.data_file_path.name)
+                    try:
+                        x = creationdate(self.data_file_path.name)
+                        self.shared_data["data_file_creation"].set(x)
+                    except Exception as e:
+                        print(e)
                 except:
                     raise
         except Exception as e:
