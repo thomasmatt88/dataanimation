@@ -6,6 +6,8 @@ import os
 import glob
 from datetime import datetime
 
+import time
+
 #https://stackoverflow.com/questions/30227466/combine-several-images-horizontally-with-python
 def combine_images(a, b):
     """"combines two Pillow Images and returns one.
@@ -77,14 +79,14 @@ def video_array(clip1, clip2, audio):
 
 def sync_videos(data_start, video_start):
 
-    print(data_start)
-    print(video_start)
+    #print(data_start)
+    #print(video_start)
 
     data_start_datetime = datetime.strptime(data_start, '%Y-%m-%d %H:%M:%S')
     video_start_datetime = datetime.strptime(video_start, '%Y-%m-%d %H:%M:%S')
 
     delta = (data_start_datetime - video_start_datetime).total_seconds()
-    print(delta)
+    #print(delta)
     
     image_list = []
     #append file names from Output_Images as strings to image_list
@@ -118,6 +120,10 @@ def sync_videos(data_start, video_start):
         test_audio = mpe.CompositeAudioClip([test_audio]) 
         #test_audio.duration += delta
         final_clip = video_array(data_clip, test, test_audio)
-        
-    final_clip.write_videofile("sync_test.mp4")
-    
+
+    print("start")      
+    t0 = time.time()
+    #final_clip.write_videofile("sync_test.mp4", threads = 8, logger = None)
+    final_clip.write_videofile("sync_test.mp4", logger = None)
+    t1 = time.time()
+    print(t1 - t0)

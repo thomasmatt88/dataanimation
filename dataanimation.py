@@ -46,9 +46,10 @@ class Tab3(ttk.Frame):
     def sync_helper(self, data_start, video_start):
         try:
             sync_videos(data_start, video_start)
-        except:
+        except Exception as e:
             messagebox.showinfo(message = "Error: Did you use proper time stamp format?")
-        
+            print(e)
+            
 class Tab2(ttk.Frame):
     def __init__(self, master, controller):
         super().__init__()
