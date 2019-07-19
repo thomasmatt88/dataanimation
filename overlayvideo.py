@@ -86,14 +86,12 @@ def sync_videos(data_start, video_start):
     delta = (data_start_datetime - video_start_datetime).total_seconds()
     print(delta)
     
-    
     image_list = []
     #append file names from Output_Images as strings to image_list
     for root, dirs, files in os.walk('Output_Images'):
         image_list += glob.glob(os.path.join(root, '*png'))
 
     image_list.sort() #sort list by file name
-
 
     data_clip = mpe.ImageSequenceClip(image_list, fps = 1)
     video_clip = mpe.VideoFileClip("trim_test.mp4")
@@ -102,12 +100,24 @@ def sync_videos(data_start, video_start):
         video_clip = video_clip.resize(video_clip.size[::-1])
         video_clip.rotation = 0
 
-    # relevant attributes for composition
-    test = data_clip.set_start(delta, change_end = True)
-    test.end += delta # this didn't seem to work
-    test.duration += delta # this worked!
+    if delta >= 0: #if data starts after video
+        # relevant attributes for composition
+        test = data_clip.set_start(delta, change_end = True)
+        #test.end += delta # this didn't seem to work
+        test.duration += delta # this worked!
     
-    final_clip = video_array(test, \
-                             video_clip, video_clip.audio)
+        final_clip = video_array(test, \
+                                 video_clip, video_clip.audio)
+    else: #if data starts before video
+        # relevant attributes for composition
+        delta = -delta
+        test = video_clip.set_start(delta, change_end = True)
+        test.duration += delta
+        test_audio = video_clip.audio.set_start(delta, change_end = True)
+        # force moviepy to register set_start from previous line
+        test_audio = mpe.CompositeAudioClip([test_audio]) 
+        #test_audio.duration += delta
+        final_clip = video_array(data_clip, test, test_audio)
+        
     final_clip.write_videofile("sync_test.mp4")
     
