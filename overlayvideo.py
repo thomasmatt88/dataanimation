@@ -28,14 +28,15 @@ def overlay_video(figure, video_clip):
 
     new_frames = []
 
-    for frame in clip.iter_frames():
+    for frame in video_clip.iter_frames():
         # convert frame to PIL image
         a = Image.fromarray(frame)
         # combine PIL images into one
-        a = combine_images(figure, a)
+        # this seems to be the root cause of error with .mov 
+        b = combine_images(figure, a)
         # convert from PIL image to frame
-        a = np.array(a)
-        new_frames.append(a)
+        c = np.array(b)
+        new_frames.append(c)
 
     new_clip = mpe.ImageSequenceClip(new_frames, fps = video_clip.fps)
     #put audio back into new_clip
@@ -44,8 +45,19 @@ def overlay_video(figure, video_clip):
     # therefore, sound is only heard if checked with VLC Media Player
     return new_clip
 
+#alternative method to overlay_video that I could not get to work but
+#may be more efficient
+"""
+def overlay_video_b(figure, video_clip):
+    modified_clip = video_clip.fl_image(lambda image: combine_images(image, figure))
+"""
+
 figure = Image.open("0.png")
-clip = mpe.VideoFileClip("IMG_3816.MOV")
+clip = mpe.VideoFileClip("trim_test.mp4")
+# prevent moviepy from automatically converting portrait to landscape
+if clip.rotation == 90:
+    clip = clip.resize(clip.size[::-1])
+    clip.rotation = 0
 new_clip = overlay_video(figure, clip)
 new_clip.write_videofile("new_file.mp4")
     
