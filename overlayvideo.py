@@ -4,6 +4,7 @@ import numpy as np
 
 import os
 import glob
+from datetime import datetime
 
 #https://stackoverflow.com/questions/30227466/combine-several-images-horizontally-with-python
 def combine_images(a, b):
@@ -74,7 +75,18 @@ def video_array(clip1, clip2, audio):
 
     return clip
 
-def sync_videos():
+def sync_videos(data_start, video_start):
+
+    print(data_start)
+    print(video_start)
+
+    data_start_datetime = datetime.strptime(data_start, '%Y-%m-%d %H:%M:%S')
+    video_start_datetime = datetime.strptime(video_start, '%Y-%m-%d %H:%M:%S')
+
+    delta = (data_start_datetime - video_start_datetime).total_seconds()
+    print(delta)
+    
+    
     image_list = []
     #append file names from Output_Images as strings to image_list
     for root, dirs, files in os.walk('Output_Images'):
@@ -89,5 +101,13 @@ def sync_videos():
     if video_clip.rotation == 90:
         video_clip = video_clip.resize(video_clip.size[::-1])
         video_clip.rotation = 0
-    final_clip = video_array(data_clip, video_clip, video_clip.audio)
+
+    # relevant attributes for composition
+    test = data_clip.set_start(delta, change_end = True)
+    test.end += delta # this didn't seem to work
+    test.duration += delta # this worked!
+    
+    final_clip = video_array(test, \
+                             video_clip, video_clip.audio)
     final_clip.write_videofile("sync_test.mp4")
+    

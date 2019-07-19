@@ -37,17 +37,21 @@ class Tab3(ttk.Frame):
 
         # --------------- buttons ---------------------------------------------
         self.syncvideoButton = tk.Button(self, text = "Sync Video", \
-                                         command = sync_videos)
+                                         command = lambda: \
+                                         sync_videos(self.data_time_stamp.get(), \
+                                         self.controller.shared_data["video_file_start"].get()))
         self.syncvideoButton.pack(side = tk.LEFT) 
         
         
 class Tab2(ttk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, controller):
         super().__init__()
+        self.controller = controller
 
         # --------------- data overlay attributes ------------------------------
         self.video_file_path = ""
-        self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+        #self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+        self.time_stamp = self.controller.shared_data["video_file_start"]
         self.time_stamp_end = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
 
         # --------------- data overlay frame -----------------------------------
@@ -101,8 +105,9 @@ class Tab2(ttk.Frame):
         
 class DataAnimationGui:
     def __init__(self, master):
-        self.shared_data = {"data_file_creation": tk.StringVar()}
+        self.shared_data = {"data_file_creation": tk.StringVar(), "video_file_start": tk.StringVar()}
         self.shared_data["data_file_creation"].set("%Y-%M-%D %H:%M:%S")
+        self.shared_data["video_file_start"].set("%Y-%M-%D %H:%M:%S")
         
         self.data_file_path = ""
         self.save_folder_path = ""
@@ -113,7 +118,7 @@ class DataAnimationGui:
         tabControl = ttk.Notebook(master)
         tab1 = ttk.Frame(tabControl)
         tabControl.add(tab1, text = "Easy Data Animation")
-        tab2 = Tab2(tabControl)
+        tab2 = Tab2(tabControl, self)
         tabControl.add(tab2, text = "Video Upload/Trim")
         tab3 = Tab3(tabControl, self)
         tabControl.add(tab3, text = "Data Animation and Video Sync")
