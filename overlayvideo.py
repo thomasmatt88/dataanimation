@@ -2,6 +2,9 @@ import moviepy.editor as mpe
 from PIL import Image
 import numpy as np
 
+import os
+import glob
+
 #https://stackoverflow.com/questions/30227466/combine-several-images-horizontally-with-python
 def combine_images(a, b):
     """"combines two Pillow Images and returns one.
@@ -51,7 +54,7 @@ def overlay_video(figure, video_clip):
 def overlay_video_b(figure, video_clip):
     modified_clip = video_clip.fl_image(lambda image: combine_images(image, figure))
 """
-
+"""
 figure = Image.open("0.png")
 clip = mpe.VideoFileClip("trim_test.mp4")
 # prevent moviepy from automatically converting portrait to landscape
@@ -60,5 +63,21 @@ if clip.rotation == 90:
     clip.rotation = 0
 new_clip = overlay_video(figure, clip)
 new_clip.write_videofile("new_file.mp4")
-    
+"""
+image_list = []
+#append file names from Output_Images as strings to image_list
+for root, dirs, files in os.walk('Output_Images'):
+    image_list += glob.glob(os.path.join(root, '*png'))
 
+image_list.sort() #sort list by file name
+
+
+data_clip = mpe.ImageSequenceClip(image_list, fps = 1)
+video_clip = mpe.VideoFileClip("IMG_3825.MOV")
+# prevent moviepy from automatically converting portrait to landscape
+if video_clip.rotation == 90:
+    video_clip = video_clip.resize(video_clip.size[::-1])
+    video_clip.rotation = 0
+final_clip = mpe.clips_array([[data_clip, video_clip]])
+final_clip = final_clip.set_audio(video_clip.audio)
+final_clip.write_videofile("test.mp4")
