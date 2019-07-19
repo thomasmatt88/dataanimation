@@ -38,10 +38,16 @@ class Tab3(ttk.Frame):
         # --------------- buttons ---------------------------------------------
         self.syncvideoButton = tk.Button(self, text = "Sync Video", \
                                          command = lambda: \
-                                         sync_videos(self.data_time_stamp.get(), \
-                                         self.controller.shared_data["video_file_start"].get()))
-        self.syncvideoButton.pack(side = tk.LEFT) 
-        
+                                         self.sync_helper(self.data_time_stamp.get(), \
+                                                          self.controller.shared_data["video_file_start"].get()))
+        self.syncvideoButton.pack(side = tk.LEFT)
+
+        # tab3 helper ---------------------------------------------------------
+    def sync_helper(self, data_start, video_start):
+        try:
+            sync_videos(data_start, video_start)
+        except:
+            messagebox.showinfo(message = "Error: Did you use proper time stamp format?")
         
 class Tab2(ttk.Frame):
     def __init__(self, master, controller):
