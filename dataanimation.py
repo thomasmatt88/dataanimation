@@ -12,6 +12,7 @@ from datafilemeta import creationdate
 # custom modules
 from videotimestamp import videotimestamp, videoendtime
 from videotrim import trim_video
+from overlayvideo import sync_videos
 
 def main():
     root_win = tk.Tk()
@@ -33,6 +34,11 @@ class Tab3(ttk.Frame):
         self.dtime_stamp_entry = tk.Entry(self, \
                                         textvariable = self.data_time_stamp)
         self.dtime_stamp_entry.pack(side = tk.LEFT)
+
+        # --------------- buttons ---------------------------------------------
+        self.syncvideoButton = tk.Button(self, text = "Sync Video", \
+                                         command = sync_videos)
+        self.syncvideoButton.pack(side = tk.LEFT) 
         
         
 class Tab2(ttk.Frame):

@@ -64,20 +64,30 @@ if clip.rotation == 90:
 new_clip = overlay_video(figure, clip)
 new_clip.write_videofile("new_file.mp4")
 """
-image_list = []
-#append file names from Output_Images as strings to image_list
-for root, dirs, files in os.walk('Output_Images'):
-    image_list += glob.glob(os.path.join(root, '*png'))
 
-image_list.sort() #sort list by file name
+def video_array(clip1, clip2, audio):
+    """generates new video clip which is an clips.array of the two video clips
+    passed to the function. accepts audio parameter as well"""
+
+    clip = mpe.clips_array([[clip1, clip2]])
+    clip = clip.set_audio(audio)
+
+    return clip
+
+def sync_videos():
+    image_list = []
+    #append file names from Output_Images as strings to image_list
+    for root, dirs, files in os.walk('Output_Images'):
+        image_list += glob.glob(os.path.join(root, '*png'))
+
+    image_list.sort() #sort list by file name
 
 
-data_clip = mpe.ImageSequenceClip(image_list, fps = 1)
-video_clip = mpe.VideoFileClip("IMG_3825.MOV")
-# prevent moviepy from automatically converting portrait to landscape
-if video_clip.rotation == 90:
-    video_clip = video_clip.resize(video_clip.size[::-1])
-    video_clip.rotation = 0
-final_clip = mpe.clips_array([[data_clip, video_clip]])
-final_clip = final_clip.set_audio(video_clip.audio)
-final_clip.write_videofile("test.mp4")
+    data_clip = mpe.ImageSequenceClip(image_list, fps = 1)
+    video_clip = mpe.VideoFileClip("trim_test.mp4")
+    # prevent moviepy from automatically converting portrait to landscape
+    if video_clip.rotation == 90:
+        video_clip = video_clip.resize(video_clip.size[::-1])
+        video_clip.rotation = 0
+    final_clip = video_array(data_clip, video_clip, video_clip.audio)
+    final_clip.write_videofile("sync_test.mp4")
