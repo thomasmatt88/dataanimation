@@ -121,9 +121,22 @@ def sync_videos(data_start, video_start):
         #test_audio.duration += delta
         final_clip = video_array(data_clip, test, test_audio)
 
+    final_clip.write_videofile("sync_test.mp4", logger = None, preset = 'ultrafast')
+    """
     print("start")      
     t0 = time.time()
     #final_clip.write_videofile("sync_test.mp4", threads = 8, logger = None)
-    final_clip.write_videofile("sync_test.mp4", logger = None)
+    #final_clip.write_videofile("sync_test.mp4", preset = 'ultrafast', logger = None)
+    #final_clip.write_videofile("sync_test.mp4", threads = 1) #15.8s
+    final_clip.write_videofile("sync_test.mp4", threads = 2) #14.0s, 12.94
+    #final_clip.write_videofile("sync_test.mp4", threads = 3) #12.4s
+    #final_clip.write_videofile("sync_test.mp4", threads = 5) #12.35s
+    #final_clip.write_videofile("sync_test.mp4", threads = 4) #13.0
+    #final_clip.write_videofile("sync_test.mp4", threads = 6) #11.76, 12.0, 11.07, 11.29
+    #final_clip.write_videofile("sync_test.mp4", threads = 8) #12.54, 11.05
+    #final_clip.write_videofile("sync_test.mp4") #12.54, 11.60
+    #final_clip.write_videofile("sync_test.mp4", threads = 7) #11.8
+    
     t1 = time.time()
     print(t1 - t0)
+    """
