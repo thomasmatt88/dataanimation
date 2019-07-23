@@ -93,7 +93,9 @@ def sync_videos(data_start, video_start):
     for root, dirs, files in os.walk('Output_Images'):
         image_list += glob.glob(os.path.join(root, '*png'))
 
-    image_list.sort() #sort list by file name
+    #sort list by file name
+    image_list.sort() #first alphabetically
+    image_list.sort(key = len) #second by filename length
 
     data_clip = mpe.ImageSequenceClip(image_list, fps = 1)
     video_clip = mpe.VideoFileClip("trim_test.mp4")
