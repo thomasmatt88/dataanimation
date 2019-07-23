@@ -109,110 +109,97 @@ class Tab2(ttk.Frame):
             self.video_file_path = v
         except Exception as e:
             messagebox.showinfo(message = "Error: Did you choose a proper file type?")
-        
-class DataAnimationGui:
-    def __init__(self, master):
-        self.shared_data = {"data_file_creation": tk.StringVar(), "video_file_start": tk.StringVar()}
-        self.shared_data["data_file_creation"].set("%Y-%M-%D %H:%M:%S")
-        self.shared_data["video_file_start"].set("%Y-%M-%D %H:%M:%S")
-        
+
+class Tab1(ttk.Frame):
+    def __init__(self, master, controller):
+        super().__init__()
+        self.controller = controller
         self.data_file_path = ""
         self.save_folder_path = ""
         self.df = pandas.DataFrame()
-        master.wm_title("Easy Data Animation")
 
-        # --------------- tabs -------------------------------------------------
-        tabControl = ttk.Notebook(master)
-        tab1 = ttk.Frame(tabControl)
-        tabControl.add(tab1, text = "Easy Data Animation")
-        tab2 = Tab2(tabControl, self)
-        tabControl.add(tab2, text = "Video Upload/Trim")
-        tab3 = Tab3(tabControl, self)
-        tabControl.add(tab3, text = "Data Animation and Video Sync")
-        tabControl.pack(expand = 1, fill = "both")
-        
         # --------------- frames --------------------------------------------------------
-        topframe = tk.Frame(tab1)
-        topframe.pack(fill = tk.X, side = tk.TOP)
+        self.topframe = tk.Frame(self) #####
+        self.topframe.pack(fill = tk.X, side = tk.TOP)
         #topframe.configure(background = "gray")
-        middleframe = tk.Frame(tab1)
-        middleframe.pack(fill = tk.X, side = tk.TOP)
-        middleleftframe = tk.Frame(middleframe)
-        middleleftframe.pack(side = tk.LEFT)
-        middlemiddleframe = tk.Frame(middleframe)
-        middlemiddleframe.pack(side = tk.LEFT)
-        middlerightframe = tk.Frame(middleframe)
-        middlerightframe.pack(side = tk.LEFT)
-        bottomframe = tk.Frame(tab1)
-        bottomframe.pack(fill = tk.X, side = tk.TOP)
-        bottomleftframe = tk.Frame(bottomframe)
-        bottomleftframe.pack(side = tk.LEFT)
-        bottomrightframe = tk.Frame(bottomframe)
-        bottomrightframe.pack(side = tk.LEFT)
+        self.middleframe = tk.Frame(self) #####
+        self.middleframe.pack(fill = tk.X, side = tk.TOP)
+        self.middleleftframe = tk.Frame(self.middleframe)
+        self.middleleftframe.pack(side = tk.LEFT)
+        self.middlemiddleframe = tk.Frame(self.middleframe)
+        self.middlemiddleframe.pack(side = tk.LEFT)
+        self.middlerightframe = tk.Frame(self.middleframe)
+        self.middlerightframe.pack(side = tk.LEFT)
+        self.bottomframe = tk.Frame(self) ####
+        self.bottomframe.pack(fill = tk.X, side = tk.TOP)
+        self.bottomleftframe = tk.Frame(self.bottomframe)
+        self.bottomleftframe.pack(side = tk.LEFT)
+        self.bottomrightframe = tk.Frame(self.bottomframe)
+        self.bottomrightframe.pack(side = tk.LEFT)
         
 
         # --------------- buttons -------------------------------------------------------
-        self.fileButton = tk.Button(topframe, text = "Open File", \
+        self.fileButton = tk.Button(self.topframe, text = "Open File", \
                                     command = self.fileopen)
         self.fileButton.pack(side = tk.LEFT)
-        self.saveButton = tk.Button(topframe, text = "Save to Folder", \
+        self.saveButton = tk.Button(self.topframe, text = "Save to Folder", \
                                     command = self.savefolder)
         self.saveButton.pack(side = tk.LEFT)
-        self.createButton = tk.Button(topframe, text = "Create Animation", \
+        self.createButton = tk.Button(self.topframe, text = "Create Animation", \
                                       command = self.create_animation)
         self.createButton.pack(side = tk.LEFT)
-        self.quitButton = tk.Button(topframe, text = "Quit", \
-                                    command = master.destroy)
+        self.quitButton = tk.Button(self.topframe, text = "Quit", \
+                                    command = self.master.destroy) #or self.quit()
         self.quitButton.pack(side = tk.LEFT)
 
         # ---------------- labels -------------------------------------------------------
-        self.x_axis_label = tk.Label(middleleftframe, text = "X-Axis: ", fg = "blue")
+        self.x_axis_label = tk.Label(self.middleleftframe, text = "X-Axis: ", fg = "blue")
         self.x_axis_label.pack(side = tk.LEFT)
-        self.y_axis_label = tk.Label(middlemiddleframe, text = "Y-Axis: ", fg = "blue")
+        self.y_axis_label = tk.Label(self.middlemiddleframe, text = "Y-Axis: ", fg = "blue")
         self.y_axis_label.pack(side = tk.LEFT)
-        self.t_axis_label = tk.Label(middlerightframe, text = "Time-Axis: ", fg = "blue")
+        self.t_axis_label = tk.Label(self.middlerightframe, text = "Time-Axis: ", fg = "blue")
         self.t_axis_label.pack(side = tk.LEFT)       
 
-        self.x_axis_title_label = tk.Label(bottomleftframe, \
+        self.x_axis_title_label = tk.Label(self.bottomleftframe, \
                                            text = "X-Axis Title: ", fg = "blue")
         self.x_axis_title_label.pack(side = tk.LEFT)
-        self.y_axis_title_label = tk.Label(bottomrightframe, \
+        self.y_axis_title_label = tk.Label(self.bottomrightframe, \
                                            text = "Y-Axis Title: ", fg = "blue")
         self.y_axis_title_label.pack(side = tk.LEFT)
 
         # ---------------- entry -------------------------------------------------------
         self.x_axis_title = tk.StringVar()
-        self.x_axis_title_entry = tk.Entry(bottomleftframe, \
+        self.x_axis_title_entry = tk.Entry(self.bottomleftframe, \
                                         textvariable = self.x_axis_title)
         self.x_axis_title_entry.pack(side = tk.LEFT)
 
         self.y_axis_title = tk.StringVar()
-        self.y_axis_title_entry = tk.Entry(bottomrightframe, \
+        self.y_axis_title_entry = tk.Entry(self.bottomrightframe, \
                                         textvariable = self.y_axis_title)
         self.y_axis_title_entry.pack(side = tk.LEFT)       
         
         # ---------------- drop down menus ----------------------------------------------
         # X-Axis:
-        self.selected_x_axis = tk.StringVar(middleleftframe) #track what x_axis_menu is set to
+        self.selected_x_axis = tk.StringVar(self.middleleftframe) #track what x_axis_menu is set to
         self.x_axis_options = [None]
         self.selected_x_axis.set(self.x_axis_options[0])
-        self.x_axis_menu = tk.OptionMenu(middleleftframe, self.selected_x_axis, \
+        self.x_axis_menu = tk.OptionMenu(self.middleleftframe, self.selected_x_axis, \
                                          *self.x_axis_options)
         self.x_axis_menu.pack(side = tk.LEFT)
 
         # Y-Axis
-        self.selected_y_axis = tk.StringVar(middlemiddleframe) #track what y_axis_menu is set to
+        self.selected_y_axis = tk.StringVar(self.middlemiddleframe) #track what y_axis_menu is set to
         self.y_axis_options = [None]
         self.selected_y_axis.set(self.y_axis_options[0])
-        self.y_axis_menu = tk.OptionMenu(middlemiddleframe, self.selected_y_axis, \
+        self.y_axis_menu = tk.OptionMenu(self.middlemiddleframe, self.selected_y_axis, \
                                          *self.y_axis_options)
         self.y_axis_menu.pack(side = tk.LEFT)
 
         # Time-Axis
-        self.selected_t_axis = tk.StringVar(middlerightframe) #track what t_axis_menu is set to
+        self.selected_t_axis = tk.StringVar(self.middlerightframe) #track what t_axis_menu is set to
         self.t_axis_options = [None]
         self.selected_t_axis.set(self.t_axis_options[0])
-        self.t_axis_menu = tk.OptionMenu(middlerightframe, self.selected_t_axis, \
+        self.t_axis_menu = tk.OptionMenu(self.middlerightframe, self.selected_t_axis, \
                                          *self.t_axis_options)
         self.t_axis_menu.pack(side = tk.LEFT)
     
@@ -228,7 +215,7 @@ class DataAnimationGui:
                     self.df = pandas.read_excel(self.data_file_path.name)
                     try:
                         x = creationdate(self.data_file_path.name)
-                        self.shared_data["data_file_creation"].set(x)
+                        self.controller.shared_data["data_file_creation"].set(x)
                     except Exception as e:
                         print(e)
                 except:
@@ -375,6 +362,24 @@ class DataAnimationGui:
 
     def get_df(self):
         return self.df
+        
+class DataAnimationGui:
+    def __init__(self, master):
+        self.shared_data = {"data_file_creation": tk.StringVar(), "video_file_start": tk.StringVar()}
+        self.shared_data["data_file_creation"].set("%Y-%M-%D %H:%M:%S")
+        self.shared_data["video_file_start"].set("%Y-%M-%D %H:%M:%S")
+        master.wm_title("DataAnimationGui")
+
+        # --------------- tabs -------------------------------------------------
+        tabControl = ttk.Notebook(master)
+        tab1 = Tab1(tabControl, self)
+        tabControl.add(tab1, text = "Easy Data Animation")
+        tab2 = Tab2(tabControl, self)
+        tabControl.add(tab2, text = "Video Upload/Trim")
+        tab3 = Tab3(tabControl, self)
+        tabControl.add(tab3, text = "Data Animation and Video Sync")
+        tabControl.pack(expand = 1, fill = "both")
+        
 
 def data_for_animate(time, x_axis, y_axis, t_axis, df):
     "returns xs and ys from df as of 'time' to be plotted in 'animate'"
