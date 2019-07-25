@@ -57,6 +57,14 @@ class Tab3(ttk.Frame):
                                         textvariable = self.data_time_stamp)
         self.dtime_stamp_entry.pack(side = tk.LEFT)
 
+        # --------------- labels 2 --------------------------------------------
+        self.dataet_label = tk.Label(self.middleframe, text = "Data Duration (s): ", fg = "blue")
+        self.dataet_label.pack(side = tk.LEFT)
+        self.dataet_choice = tk.Label(self.middleframe, \
+                                       textvariable = self.controller.shared_data["data_file_end"], \
+                                       fg = "blue")
+        self.dataet_choice.pack(side = tk.LEFT)
+
         # --------------- buttons ---------------------------------------------
         self.syncvideoButton = tk.Button(self.middleframe, text = "Sync Video", \
                                          command = lambda: \
@@ -310,6 +318,7 @@ class Tab1(ttk.Frame):
             #for some reason 0 is called twice so we need to add an extra frame in order
             #to get last data point
             FRAMES = TABLE[usr_t_axis].astype(int).max() + 1
+            self.controller.shared_data["data_file_end"].set(str(FRAMES)) # update shared IntVar()
 
             #FuncAnimation will animate to 'fig' based on function passed to it
             #called 'animate'. Every 'interval' (1000 ms) 'animate' will be called.
@@ -390,9 +399,10 @@ class Tab1(ttk.Frame):
         
 class DataAnimationGui:
     def __init__(self, master):
-        self.shared_data = {"data_file_creation": tk.StringVar(), "video_file_start": tk.StringVar(), \
-                            "video_file_end": tk.StringVar()}
+        self.shared_data = {"data_file_creation": tk.StringVar(), "data_file_end": tk.StringVar(), \
+                            "video_file_start": tk.StringVar(), "video_file_end": tk.StringVar()}
         self.shared_data["data_file_creation"].set("%Y-%M-%D %H:%M:%S")
+        self.shared_data["data_file_end"].set("N/A")
         self.shared_data["video_file_start"].set("%Y-%M-%D %H:%M:%S")
         self.shared_data["video_file_end"].set("%Y-%M-%D %H:%M:%S")
         master.wm_title("DataAnimationGui")
