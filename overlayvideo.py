@@ -77,7 +77,7 @@ def video_array(clip1, clip2, audio):
 
     return clip
 
-def sync_videos(data_start, video_start):
+def sync_videos(data_start, video_start, data_ani_path):
 
     #print(data_start)
     #print(video_start)
@@ -90,7 +90,7 @@ def sync_videos(data_start, video_start):
     
     image_list = []
     #append file names from Output_Images as strings to image_list
-    for root, dirs, files in os.walk('Output_Images'):
+    for root, dirs, files in os.walk(data_ani_path):
         image_list += glob.glob(os.path.join(root, '*png'))
         image_list += glob.glob(os.path.join(root, '*jpg'))
         image_list += glob.glob(os.path.join(root, '*jpeg'))

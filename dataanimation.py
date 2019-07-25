@@ -75,7 +75,9 @@ class Tab3(ttk.Frame):
         # tab3 helper ---------------------------------------------------------
     def sync_helper(self, data_start, video_start):
         try:
-            sync_videos(data_start, video_start)
+            sync_videos(data_start, video_start, self.controller.shared_data["save_folder_path"])
+        except IndexError:
+            messagebox.showinfo(message = "Error: Did you choose a folder to save data animation images to?")
         except Exception as e:
             messagebox.showinfo(message = "Error: Did you use proper time stamp format?")
             print(e)
@@ -148,7 +150,7 @@ class Tab1(ttk.Frame):
         super().__init__()
         self.controller = controller
         self.data_file_path = ""
-        self.save_folder_path = ""
+        #self.save_folder_path = ""
         self.df = pandas.DataFrame()
 
         # --------------- frames --------------------------------------------------------
@@ -271,7 +273,7 @@ class Tab1(ttk.Frame):
 
     def savefolder(self):
         "choose folder to save images too"
-        self.save_folder_path = tk.filedialog.askdirectory()
+        self.controller.shared_data["save_folder_path"] = tk.filedialog.askdirectory()
 
     def create_animation(self):
         try:
@@ -330,8 +332,9 @@ class Tab1(ttk.Frame):
             ani = animation.FuncAnimation(fig, animate, interval = 1000, frames = FRAMES, \
                                           fargs = (xs, ys, usr_x_axis, usr_x_axis_title,
                                                    usr_y_axis, usr_y_axis_title, usr_t_axis, \
-                                                   fig, ax1, TABLE, self.save_folder_path), \
-                                                    repeat = False)
+                                                   fig, ax1, TABLE, \
+                                                   self.controller.shared_data["save_folder_path"]), \
+                                                   repeat = False)
 
             #all rc settings are stored in a dictionary-like variable called
             #matplotlib.rcParams, which is global to the matplotlib package
@@ -400,7 +403,8 @@ class Tab1(ttk.Frame):
 class DataAnimationGui:
     def __init__(self, master):
         self.shared_data = {"data_file_creation": tk.StringVar(), "data_file_end": tk.StringVar(), \
-                            "video_file_start": tk.StringVar(), "video_file_end": tk.StringVar()}
+                            "video_file_start": tk.StringVar(), "video_file_end": tk.StringVar(), \
+                            "save_folder_path": ""}
         self.shared_data["data_file_creation"].set("%Y-%M-%D %H:%M:%S")
         self.shared_data["data_file_end"].set("N/A")
         self.shared_data["video_file_start"].set("%Y-%M-%D %H:%M:%S")
