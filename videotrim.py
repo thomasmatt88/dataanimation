@@ -45,10 +45,18 @@ def trim_end(new_end_time, video_file_path, video_clip, start):
     return final_clip
 
 def trim_video(new_start_time, new_end_time, video_file_path):
-    clip, start = trim_start(new_start_time, video_file_path)
-    clip = trim_end(new_end_time, video_file_path, clip, start)
-    save_video_clip(clip, "trim_test.mp4")
     
+    t1 = datetime.strptime(new_start_time, '%Y-%m-%d %H:%M:%S')
+    t2 = datetime.strptime(new_end_time, '%Y-%m-%d %H:%M:%S')
+    if t1 < t2:
+        clip, start = trim_start(new_start_time, video_file_path)
+        clip = trim_end(new_end_time, video_file_path, clip, start)
+        save_video_clip(clip, "trim_test.mp4")
+    else:
+        raise CustomError 
+
+class CustomError(Exception):
+    pass
 
 def save_video_clip(video_clip, file_name):
     """saves videoclip into file with optimal settings for youtube"""

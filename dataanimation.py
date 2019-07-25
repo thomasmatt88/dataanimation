@@ -12,7 +12,9 @@ from datafilemeta import creationdate
 # custom modules
 from videotimestamp import videotimestamp, videoendtime
 from videotrim import trim_video
+from videotrim import CustomError
 from overlayvideo import sync_videos
+
 
 def main():
     root_win = tk.Tk()
@@ -95,6 +97,8 @@ class Tab2(ttk.Frame):
             trim_video(start_time, end_time, video_file_path)
         except ValueError:
             messagebox.showinfo(message = "Error: Did you use proper time stamp format?")
+        except CustomError:
+            messagebox.showinfo(message = "Error: End Time must be after Start Time.")
         #except Exception as e:
             #print(e)
     
