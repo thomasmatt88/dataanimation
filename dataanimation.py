@@ -28,17 +28,37 @@ class Tab3(ttk.Frame):
         #self.data_time_stamp = tk.StringVar(value = self.controller.shared_data["test"].get())
         self.data_time_stamp = self.controller.shared_data["data_file_creation"]
 
+        # --------------- frames -----------------------------------------------
+        self.topframe = tk.Frame(self) #####
+        self.topframe.pack(fill = tk.X, side = tk.TOP)
+        #topframe.configure(background = "gray")
+        self.middleframe = tk.Frame(self) #####
+        self.middleframe.pack(fill = tk.X, side = tk.TOP)
+
         # --------------- labels -----------------------------------------------
-        self.dt_stamp_label = tk.Label(self, text = "Data Start-Time: ", fg = "blue")
+        self.videost_label = tk.Label(self.topframe, text = "Video Start-Time:", fg = "blue")
+        self.videost_label.pack(side = tk.LEFT)
+        self.videost_choice = tk.Label(self.topframe, \
+                                       textvariable = self.controller.shared_data["video_file_start"], \
+                                       fg = "blue")
+        self.videost_choice.pack(side = tk.LEFT)
+        self.videoet_label = tk.Label(self.topframe, text = "Video End-Time:", fg = "blue")
+        self.videoet_label.pack(side = tk.LEFT)
+        self.videoet_choice = tk.Label(self.topframe, \
+                                       textvariable = self.controller.shared_data["video_file_end"], \
+                                       fg = "blue")
+        self.videoet_choice.pack(side = tk.LEFT)
+        
+        self.dt_stamp_label = tk.Label(self.middleframe, text = "Data Start-Time: ", fg = "blue")
         self.dt_stamp_label.pack(side = tk.LEFT)
 
         # --------------- entry -----------------------------------------------
-        self.dtime_stamp_entry = tk.Entry(self, \
+        self.dtime_stamp_entry = tk.Entry(self.middleframe, \
                                         textvariable = self.data_time_stamp)
         self.dtime_stamp_entry.pack(side = tk.LEFT)
 
         # --------------- buttons ---------------------------------------------
-        self.syncvideoButton = tk.Button(self, text = "Sync Video", \
+        self.syncvideoButton = tk.Button(self.middleframe, text = "Sync Video", \
                                          command = lambda: \
                                          self.sync_helper(self.data_time_stamp.get(), \
                                                           self.controller.shared_data["video_file_start"].get()))
@@ -61,7 +81,8 @@ class Tab2(ttk.Frame):
         self.video_file_path = ""
         #self.time_stamp = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
         self.time_stamp = self.controller.shared_data["video_file_start"]
-        self.time_stamp_end = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+        #self.time_stamp_end = tk.StringVar(value = "%Y-%M-%D %H:%M:%S")
+        self.time_stamp_end = self.controller.shared_data["video_file_end"]
 
         # --------------- data overlay frame -----------------------------------
         self.videofileButton = tk.Button(self, text = "Open Video File", \
@@ -369,9 +390,11 @@ class Tab1(ttk.Frame):
         
 class DataAnimationGui:
     def __init__(self, master):
-        self.shared_data = {"data_file_creation": tk.StringVar(), "video_file_start": tk.StringVar()}
+        self.shared_data = {"data_file_creation": tk.StringVar(), "video_file_start": tk.StringVar(), \
+                            "video_file_end": tk.StringVar()}
         self.shared_data["data_file_creation"].set("%Y-%M-%D %H:%M:%S")
         self.shared_data["video_file_start"].set("%Y-%M-%D %H:%M:%S")
+        self.shared_data["video_file_end"].set("%Y-%M-%D %H:%M:%S")
         master.wm_title("DataAnimationGui")
 
         # --------------- tabs -------------------------------------------------
